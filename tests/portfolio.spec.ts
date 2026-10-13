@@ -8,8 +8,8 @@ async function awards(page: Page): Promise<string[]> {
 async function consoleClaim(page: Page) {
   return page.evaluate(() => (window as unknown as { portfolio: { claim: (name: string) => boolean } }).portfolio.claim('console'));
 }
-async function keyboardSkip(page: Page) {
-  await page.keyboard.press('Tab');
+async function keyboardSkip(page: Page, webkit = false) {
+  await page.keyboard.press(webkit ? 'Alt+Tab' : 'Tab');
   await expect(page.locator('[data-skip]')).toBeFocused();
   await page.keyboard.press('Enter');
 }
@@ -33,8 +33,10 @@ for (const route of ['/', '/de/']) {
     await page.locator('#discoveries-toggle').click();
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });
-    await page.setViewportSize({ width: 640, height: 900 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    for (const width of [320, 640]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
   });
 }
 
@@ -54,16 +56,18 @@ test('language arrival, clean URLs and progress across locales', async ({ page }
   await expect(page).toHaveURL(/4322\/$/);
 });
 
-test('keyboard and skip achievements require real activation', async ({ page }) => {
+test('keyboard and skip achievements require real activation', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.locator('.main-nav a').first().click();
   expect(await awards(page)).not.toContain('keyboard');
   await page.goto('/');
-  await page.keyboard.press('Tab');
+  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
   expect(await awards(page)).not.toContain('keyboard');
   await page.keyboard.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
   expect(await awards(page)).toEqual(expect.arrayContaining(['keyboard', 'skip']));
+  await expect(page.locator('#achievement-notification')).toContainText('Skip ahead');
+  await expect(page.locator('#achievement-notification')).toContainText('Keyboard navigator');
   // A programmatically dispatched event cannot claim keyboard navigation.
   await page.locator('#reset-discoveries').evaluate(element => (element as HTMLElement).click());
   await page.locator('.main-nav a').first().evaluate(element => {
@@ -106,9 +110,9 @@ test('console, source codes, duplicates and reset', async ({ page }) => {
   await expect(page.locator('#discoveries-toggle')).toBeVisible();
 });
 
-test('all main discoveries earn the badge without developer bonuses', async ({ page }) => {
+test('all main discoveries earn the badge without developer bonuses', async ({ page }, testInfo) => {
   await page.goto('/');
-  await keyboardSkip(page);
+  await keyboardSkip(page, testInfo.project.name === 'webkit');
   await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
     await page.locator(`[data-discovery-section="${id}"]`).scrollIntoViewIfNeeded();
@@ -161,4 +165,38 @@ test('no-JavaScript content and locale navigation', async ({ browser }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'de');
   await expect(page.locator('#discoveries-toggle')).toBeHidden();
   await context.close();
+});
+
+test('same-locale and invalid arrival tokens do not award language', async ({ page }) => {
+  for (const query of ['en', 'invalid']) {
+    await page.goto(`/?explore=${query}`);
+    expect(await awards(page)).not.toContain('language');
+    await expect(page).toHaveURL(/4322\/$/);
+  }
+});
+
+test('Space activates a button after native Tab focus', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await consoleClaim(page);
+  // Start before the control, then reach it through actual native navigation.
+  await page.locator('#discoveries-toggle').focus();
+  const tab = testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab';
+  const reverseTab = testInfo.project.name === 'webkit' ? 'Alt+Shift+Tab' : 'Shift+Tab';
+  await page.keyboard.press(tab);
+  await page.keyboard.press(reverseTab);
+  await expect(page.locator('#discoveries-toggle')).toBeFocused();
+  expect(await awards(page)).not.toContain('keyboard');
+  await page.keyboard.press('Space');
+  await expect(page.locator('#discoveries-toggle')).toHaveAttribute('aria-expanded', 'true');
+  expect(await awards(page)).toContain('keyboard');
+});
+
+test('section discovery works without IntersectionObserver', async ({ page }) => {
+  await page.addInitScript(() => { Object.defineProperty(window, 'IntersectionObserver', { value: undefined }); });
+  await page.goto('/');
+  for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
+    await page.locator(`[data-discovery-section="${id}"]`).scrollIntoViewIfNeeded();
+    await expect.poll(async () => page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').seen || [], storageKey)).toContain(id);
+  }
+  expect(await awards(page)).toContain('story');
 });

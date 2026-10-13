@@ -48,4 +48,6 @@ Four exploration achievements earn an Explorer badge: switch locale, activate an
 
 Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. An ephemeral `explore` URL parameter records arrival after language switching, including when storage is unavailable, and is removed on arrival. Locale changes preserve saved achievements and section progress. Reset clears both.
 
+Keyboard navigation follows browser settings. On macOS Safari, use Option–Tab if ordinary Tab does not focus links; the site does not intercept or replace native navigation.
+
 The console exposes only `portfolio.claim("console")`. Source codes are playful discoveries, not secrets. HTML compression is disabled to retain the source clue. Without JavaScript, content, skip navigation and locale links work; game controls stay hidden.

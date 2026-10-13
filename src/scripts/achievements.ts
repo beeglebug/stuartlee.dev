@@ -17,6 +17,8 @@ const feedback = document.getElementById('source-feedback')!;
 const awarded = new Set<AchievementId>();
 const seen = new Set<string>();
 let noticeTimer: ReturnType<typeof setTimeout>;
+let announcementTimer: ReturnType<typeof setTimeout> | undefined;
+let pendingAnnouncements: string[] = [];
 
 // Storage is a convenience, never a requirement for using the page.
 try {
@@ -53,9 +55,17 @@ function render() {
   badge.hidden = !complete();
 }
 function announce(message: string) {
-  clearTimeout(noticeTimer);
-  notification.textContent = message;
-  noticeTimer = setTimeout(() => { notification.textContent = ''; }, 7000);
+  pendingAnnouncements.push(message);
+  if (announcementTimer !== undefined) return;
+  // One action can unlock two achievements. Combine their messages so the live
+  // region doesn't replace an announcement before assistive technology reads it.
+  announcementTimer = setTimeout(() => {
+    clearTimeout(noticeTimer);
+    notification.textContent = pendingAnnouncements.join(' ');
+    pendingAnnouncements = [];
+    announcementTimer = undefined;
+    noticeTimer = setTimeout(() => { notification.textContent = ''; }, 7000);
+  }, 0);
 }
 function award(id: AchievementId): boolean {
   if (awarded.has(id)) return false;
@@ -125,8 +135,16 @@ document.addEventListener('focusin', event => {
 document.addEventListener('click', event => {
   if (!event.isTrusted) return;
   const target = event.target instanceof Element ? event.target.closest('a, button') : null;
-  if (event.detail === 0 && activationTarget && target === activationTarget) award('keyboard');
+  // Firefox reports detail=1 even for Enter-generated clicks. The preceding
+  // trusted key event and absence of pointer input establish keyboard use.
+  if (activationTarget && target === activationTarget) award('keyboard');
   activationTarget = null;
+});
+document.addEventListener('keyup', event => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    // Native Space activation may click on keyup; expire unused attempts after it.
+    setTimeout(() => { activationTarget = null; }, 0);
+  }
 });
 
 const sections = [...document.querySelectorAll<HTMLElement>('[data-discovery-section]')];
