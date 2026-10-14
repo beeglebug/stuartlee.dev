@@ -25,6 +25,10 @@ const toggle = document.getElementById(
   'discoveries-toggle',
 ) as HTMLButtonElement;
 const notification = document.getElementById('achievement-notification')!;
+const completionNotification = document.getElementById(
+  'completion-notification',
+)!;
+let completionTimer: ReturnType<typeof setTimeout> | undefined;
 const badge = document.getElementById('explorer-badge')!;
 const feedback = document.getElementById('source-feedback')!;
 const awarded = new Set<AchievementId>();
@@ -66,6 +70,9 @@ function save() {
 function complete() {
   return mainAchievements.every((id) => awarded.has(id));
 }
+function allComplete() {
+  return achievementIds.every((id) => awarded.has(id));
+}
 function render() {
   // Keep the control available after a reset, so it doesn't disappear beneath focus.
   if (awarded.size) toggle.hidden = false;
@@ -83,6 +90,7 @@ function render() {
       : t.locked;
   }
   badge.hidden = !complete();
+  document.getElementById('discovery-star')!.hidden = !allComplete();
 }
 function announce(message: string) {
   pendingAnnouncements.push(message);
@@ -91,28 +99,61 @@ function announce(message: string) {
   // region doesn't replace an announcement before assistive technology reads it.
   announcementTimer = setTimeout(() => {
     clearTimeout(noticeTimer);
+    notification.showPopover();
     notification.textContent = pendingAnnouncements.join(' ');
     pendingAnnouncements = [];
     announcementTimer = undefined;
     noticeTimer = setTimeout(() => {
       notification.textContent = '';
+      notification.hidePopover();
     }, 7000);
   }, 0);
+}
+function celebrateCompletion() {
+  // Let the final individual discovery appear first, then celebrate the set.
+  completionTimer = setTimeout(() => {
+    clearTimeout(noticeTimer);
+    notification.textContent = '';
+    notification.hidePopover();
+    completionNotification.showPopover();
+    completionNotification.textContent = t.allComplete;
+    completionTimer = setTimeout(() => {
+      completionNotification.textContent = '';
+      completionNotification.hidePopover();
+    }, 7000);
+  }, 3500);
 }
 function award(id: AchievementId): boolean {
   if (awarded.has(id)) return false;
   const wasComplete = complete();
+  const wasAllComplete = allComplete();
   awarded.add(id);
   save();
   render();
   announce(
     `${t.award} ${t.achievements[id].title}${!wasComplete && complete() ? ` — ${t.explorer}. ${t.complete}` : ''}`,
   );
+  if (!wasAllComplete && allComplete()) celebrateCompletion();
   return true;
 }
 
 render();
 initialiseDiscoveriesDialog();
+
+for (const button of document.querySelectorAll<HTMLButtonElement>(
+  '[data-theme-choice]',
+)) {
+  button.addEventListener(
+    'click',
+    () => {
+      if (button.getAttribute('aria-pressed') !== 'true') award('light');
+    },
+    { capture: true },
+  );
+}
+const bug = document.getElementById('beeglebug') as HTMLButtonElement;
+bug.hidden = false;
+bug.addEventListener('click', () => award('bug'));
 
 // A navigation token proves arrival at the destination, works across tabs, and
 // doesn't depend on storage. Remove it immediately so it isn't copied into links.
@@ -195,6 +236,9 @@ document.getElementById('source-form')!.addEventListener('submit', (event) => {
   if (valid) award('source');
 });
 document.getElementById('reset-discoveries')!.addEventListener('click', () => {
+  clearTimeout(completionTimer);
+  completionNotification.textContent = '';
+  completionNotification.hidePopover();
   awarded.clear();
   seen.clear();
   save();

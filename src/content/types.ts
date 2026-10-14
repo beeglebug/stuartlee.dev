@@ -1,6 +1,13 @@
 export type Locale = 'en' | 'de';
 export type AchievementId =
-  'language' | 'keyboard' | 'skip' | 'story' | 'console' | 'source';
+  | 'language'
+  | 'keyboard'
+  | 'skip'
+  | 'story'
+  | 'light'
+  | 'bug'
+  | 'console'
+  | 'source';
 
 export interface Project {
   id: string;
@@ -10,6 +17,25 @@ export interface Project {
   decisions: string;
   outcomes: string;
 }
+
+export interface ApproachItem {
+  title: string;
+  text: string;
+}
+
+export interface ProjectFieldLabels {
+  context: string;
+  contribution: string;
+  decisions: string;
+  outcomes: string;
+}
+
+export interface AchievementCopy {
+  title: string;
+  hint: string;
+}
+
+export type AchievementTranslations = Record<AchievementId, AchievementCopy>;
 
 export interface Translation {
   meta: { title: string; description: string };
@@ -35,11 +61,12 @@ export interface Translation {
     title: string;
     paragraphs: string[];
     caption: string;
+    bugLabel: string;
   };
   approach: {
     label: string;
     title: string;
-    items: { title: string; text: string }[];
+    items: ApproachItem[];
   };
   projects: {
     label: string;
@@ -47,12 +74,7 @@ export interface Translation {
     status: string;
     intro: string;
     note: string;
-    fields: {
-      context: string;
-      contribution: string;
-      decisions: string;
-      outcomes: string;
-    };
+    fields: ProjectFieldLabels;
   };
   contact: {
     label: string;
@@ -84,6 +106,7 @@ export interface Translation {
     explorer: string;
     complete: string;
     consoleClue: string;
-    achievements: Record<AchievementId, { title: string; hint: string }>;
+    allComplete: string;
+    achievements: AchievementTranslations;
   };
 }

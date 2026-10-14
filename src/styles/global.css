@@ -758,3 +758,42 @@ body.dialog-open {
     display: none !important;
   }
 }
+
+/* Personal discovery and full-set reward */
+.beeglebug {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  margin-block-start: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.beeglebug:hover,
+.beeglebug:focus-visible {
+  color: var(--accent);
+  background: var(--highlight);
+}
+.discovery-star {
+  color: var(--accent);
+  font-size: 1rem;
+}
+.notification[popover] {
+  inset-block-start: auto;
+  inset-inline-start: auto;
+  margin: 0;
+}
+.completion-notification {
+  border-color: var(--highlight-line);
+  background: var(--highlight);
+  font-weight: 600;
+}
+@media print {
+  .beeglebug {
+    display: none !important;
+  }
+}

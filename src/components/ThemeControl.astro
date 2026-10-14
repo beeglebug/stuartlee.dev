@@ -1,21 +1,27 @@
 ---
-import type { Translation } from '../content/types';
-
 interface Props {
-  content: Translation['theme'];
+  label: string;
+  light: string;
+  dark: string;
+  system: string;
 }
-const { content } = Astro.props;
+const { label, light, dark, system } = Astro.props;
+const choices = [
+  { value: 'light', label: light },
+  { value: 'dark', label: dark },
+  { value: 'system', label: system },
+];
 ---
 
-<div class="theme-control" role="group" aria-label={content.label} hidden>
-  <span>{content.label}</span>
-  {(['light', 'dark', 'system'] as const).map((theme) => (
+<div class="theme-control" role="group" aria-label={label} hidden>
+  <span>{label}</span>
+  {choices.map((theme) => (
     <button
       type="button"
-      data-theme-choice={theme}
-      aria-pressed={theme === 'system' ? 'true' : 'false'}
+      data-theme-choice={theme.value}
+      aria-pressed={theme.value === 'system' ? 'true' : 'false'}
     >
-      {content[theme]}
+      {theme.label}
     </button>
   ))}
 </div>

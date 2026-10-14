@@ -32,6 +32,7 @@ export const de = {
       'Bei Fruugo arbeite ich vor allem mit React und TypeScript an Anwendungen für Kunden und Händler einer internationalen E-Commerce-Plattform. Zuvor war ich acht Jahre bei DRPG tätig, vom Webentwickler über den Lead Developer bis zum Senior JavaScript Engineer.',
       'Meine frühere Arbeit im E-Commerce bei OGL und im Systemtest bei Inspired Gaming hat mir eine wertvolle Grundlage gegeben: Software entwickeln und zugleich fragen, wo sie scheitern könnte. Diese Perspektive prägt meine Arbeit bis heute.',
     ],
+    bugLabel: 'Ein kleiner Käfer',
     caption: 'Frontend-Entwicklung mit Blick auf das gesamte Produkt.',
   },
   approach: {
@@ -102,7 +103,9 @@ export const de = {
     award: 'Erfolg freigeschaltet:',
     explorer: 'Entdecker',
     complete:
-      'Alle vier Erkundungserfolge gefunden. Vielen Dank für den genaueren Blick!',
+      'Alle sechs Erkundungserfolge gefunden. Vielen Dank für den genaueren Blick!',
+    allComplete:
+      'Alle acht Entdeckungen gefunden! Danke, dass du jeden Winkel erkundet hast. ★',
     consoleClue:
       'Neugierig, wie alles funktioniert? Mit helloThere() erhalten Sie eine Bonus-Entdeckung.',
     achievements: {
@@ -121,6 +124,14 @@ export const de = {
       story: {
         title: 'Die ganze Geschichte',
         hint: 'Sehen Sie sich jeden Abschnitt an, einschließlich der Einleitung und der Einladung zum Gespräch.',
+      },
+      light: {
+        title: 'Anderes Licht',
+        hint: 'Ändere die Darstellung der Seite.',
+      },
+      bug: {
+        title: 'Beeglebug',
+        hint: 'Bei der Vorstellung meines beruflichen Hintergrunds sitzt ein kleiner Käfer. Sag hallo.',
       },
       console: {
         title: 'Neugierig auf die Konsole',

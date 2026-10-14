@@ -9,6 +9,8 @@ export const achievementIds = [
   'keyboard',
   'skip',
   'story',
+  'light',
+  'bug',
   'console',
   'source',
 ] as const;
@@ -17,6 +19,8 @@ export const mainAchievements: AchievementId[] = [
   'keyboard',
   'skip',
   'story',
+  'light',
+  'bug',
 ];
 
 export const translations: Record<Locale, Translation> = { en, de };

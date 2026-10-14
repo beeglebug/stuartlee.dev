@@ -1,10 +1,12 @@
 ---
-import type { Translation } from '../content/types';
+import type { ApproachItem } from '../content/types';
 
 interface Props {
-  content: Translation['approach'];
+  label: string;
+  title: string;
+  items: ApproachItem[];
 }
-const { content } = Astro.props;
+const { label, title, items } = Astro.props;
 ---
 
 <section
@@ -14,15 +16,15 @@ const { content } = Astro.props;
   data-discovery-section="approach"
 >
   <div class="section-heading">
-    <p class="eyebrow">{content.label}</p>
+    <p class="eyebrow">{label}</p>
     <h2 id="approach-heading">
-      {content.title.split('\n').map((line) => (
+      {title.split('\n').map((line) => (
         <span>{line}</span>
       ))}
     </h2>
   </div>
   <div class="principles">
-    {content.items.map((item, i) => (
+    {items.map((item, i) => (
       <article class="principle">
         <span class="principle-number" aria-hidden="true">
           0{i + 1}

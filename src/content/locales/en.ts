@@ -32,6 +32,7 @@ export const en = {
       'At Fruugo, I work on customer and retailer-facing applications for an international e-commerce platform, primarily with React and TypeScript. Before that, I spent eight years at DRPG, progressing from web developer to lead developer and senior JavaScript engineer.',
       'Earlier work in e-commerce at OGL and system testing at Inspired Gaming gave me a useful grounding in both building software and asking how it might fail. That perspective still shapes how I work today.',
     ],
+    bugLabel: 'A little bug',
     caption: 'Frontend engineering, with the whole product in mind.',
   },
   approach: {
@@ -101,7 +102,9 @@ export const en = {
     award: 'Achievement unlocked:',
     explorer: 'Explorer',
     complete:
-      'All four exploration achievements found. Thanks for taking a closer look!',
+      'All six exploration achievements found. Thanks for taking a closer look!',
+    allComplete:
+      'All eight discoveries found! Thanks for exploring every corner. ★',
     consoleClue:
       'Curious about how things work? Run helloThere() to claim a bonus discovery.',
     achievements: {
@@ -120,6 +123,14 @@ export const en = {
       story: {
         title: 'The full story',
         hint: 'Take a look at each section, including the introduction and the invitation to connect.',
+      },
+      light: {
+        title: 'Different light',
+        hint: 'Try changing the appearance of the page.',
+      },
+      bug: {
+        title: 'Beeglebug',
+        hint: 'There’s a little bug near the introduction to my background. Say hello.',
       },
       console: {
         title: 'Console curious',

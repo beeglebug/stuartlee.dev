@@ -1,10 +1,13 @@
 ---
-import type { Translation } from '../content/types';
-
 interface Props {
-  content: Translation['hero'];
+  eyebrow: string;
+  title: string;
+  intro: string;
+  contact: string;
+  more: string;
+  note: string;
 }
-const { content } = Astro.props;
+const { eyebrow, title, intro, contact, more, note } = Astro.props;
 ---
 
 <section
@@ -15,24 +18,24 @@ const { content } = Astro.props;
   <div class="hero-copy">
     <p class="eyebrow">
       <span class="blue-dot" aria-hidden="true"></span>
-      {content.eyebrow}
+      {eyebrow}
     </p>
     <h1 id="hero-heading">
-      {content.title.split('\n').map((line, i) => (
+      {title.split('\n').map((line, i) => (
         <span class={i === 1 ? 'accent' : undefined}>{line}</span>
       ))}
     </h1>
-    <p class="hero-intro">{content.intro}</p>
+    <p class="hero-intro">{intro}</p>
     <div class="actions">
       <a class="button" href="https://www.linkedin.com/in/beeglebug/">
-        {content.contact}
+        {contact}
         <span aria-hidden="true">↗</span>
       </a>
       <a class="text-link" href="#about">
-        {content.more}
+        {more}
         <span aria-hidden="true">↓</span>
       </a>
     </div>
-    <p class="hero-note">{content.note}</p>
+    <p class="hero-note">{note}</p>
   </div>
 </section>

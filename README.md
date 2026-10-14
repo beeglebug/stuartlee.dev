@@ -59,9 +59,9 @@ This repository has not been deployed by Codex.
 
 ## Discovery achievements
 
-Four exploration achievements earn an Explorer badge: switch locale, activate an element other than the skip link after Tab navigation, use the skip link, and view all five main sections. Two optional bonuses are earned through the console and a source comment. The first unlock exposes a control in the footer that opens the discoveries modal.
+Six exploration achievements earn an Explorer badge: switch locale, activate an element other than the skip link after Tab navigation, use the skip link, view all five main sections, change the appearance setting, and greet the little Beeglebug in About. Two optional bonuses are earned through the console and a source comment. The first unlock exposes a control in the footer that opens the discoveries modal.
 
-Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. An ephemeral `explore` URL parameter records arrival after language switching, including when storage is unavailable, and is removed on arrival. Locale changes preserve saved achievements and section progress. Reset clears both.
+Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. An ephemeral `explore` URL parameter records arrival after language switching, including when storage is unavailable, and is removed on arrival. Locale changes preserve saved achievements and section progress. Reset clears both. Collecting all eight discoveries adds a persistent star beside the total and shows a separate completion toast after the final discovery toast. Reloading restores the star without repeating the celebration.
 
 Keyboard navigation follows browser settings. On macOS Safari, use Option–Tab if ordinary Tab does not focus links; the site does not intercept or replace native navigation.
 

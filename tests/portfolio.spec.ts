@@ -207,6 +207,8 @@ test('all main discoveries earn the badge without developer bonuses', async ({
     expect.arrayContaining(['language', 'keyboard', 'skip', 'story']),
   );
   expect(await awards(page)).not.toContain('console');
+  await page.locator('[data-theme-choice="light"]').click();
+  await page.locator('#beeglebug').click();
   await page.locator('#discoveries-toggle').click();
   await expect(page.locator('#explorer-badge')).toBeVisible();
   await page.reload();
@@ -422,4 +424,125 @@ test('appearance follows system, persists overrides and passes dark accessibilit
       .locator('html')
       .evaluate((element) => getComputedStyle(element).colorScheme),
   ).toBe('dark');
+});
+
+test('new discoveries require interaction and appear in both locales', async ({
+  page,
+}) => {
+  await page.goto('/');
+  expect(await awards(page)).not.toContain('light');
+  await page.locator('[data-theme-choice="system"]').click();
+  expect(await awards(page)).not.toContain('light');
+  await page.locator('[data-theme-choice="dark"]').click();
+  expect(await awards(page)).toContain('light');
+  await page.locator('#beeglebug').focus();
+  await page.keyboard.press('Space');
+  expect(await awards(page)).toContain('bug');
+  await page.locator('#discoveries-toggle').click();
+  await expect(page.locator('#discovery-count')).toHaveText(
+    `${(await awards(page)).length}/8`,
+  );
+  await expect(page.locator('#discovery-star')).toBeHidden();
+  await expect(page.locator('[data-achievement="light"]')).toContainText(
+    'Different light',
+  );
+  await expect(page.locator('[data-achievement="bug"]')).toHaveAttribute(
+    'data-unlocked',
+    '',
+  );
+  await page.keyboard.press('Escape');
+  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
+  await page.locator('#discoveries-toggle').click();
+  await expect(page.locator('[data-achievement="light"]')).toContainText(
+    'Anderes Licht',
+  );
+  await expect(page.locator('[data-achievement="bug"]')).toHaveAttribute(
+    'data-unlocked',
+    '',
+  );
+});
+
+for (const last of ['bug', 'light', 'console', 'source']) {
+  test(`all eight completion works when the last discovery is ${last}`, async ({
+    page,
+  }) => {
+    const ids = [
+      'language',
+      'keyboard',
+      'skip',
+      'story',
+      'light',
+      'bug',
+      'console',
+      'source',
+    ];
+    await page.addInitScript(
+      ({ key, awarded }) => {
+        localStorage.setItem(key, JSON.stringify({ awarded, seen: [] }));
+      },
+      { key: storageKey, awarded: ids.filter((id) => id !== last) },
+    );
+    await page.goto('/');
+    await expect(page.locator('#discovery-star')).toBeHidden();
+    await expect(page.locator('#completion-notification')).toBeHidden();
+    if (last === 'bug') await page.locator('#beeglebug').click();
+    if (last === 'light')
+      await page.locator('[data-theme-choice="dark"]').click();
+    if (last === 'console') await consoleClaim(page);
+    if (last === 'source') {
+      await page.locator('#discoveries-toggle').click();
+      await page.locator('#source-code').fill('BUILT-WITH-CARE');
+      await page.locator('#source-form button').click();
+    }
+    await expect(page.locator('#discovery-count')).toHaveText('8/8');
+    await expect(page.locator('#discovery-star')).toBeVisible();
+    await expect(page.locator('#achievement-notification')).toBeVisible();
+    await expect(page.locator('#completion-notification')).toBeHidden();
+    await expect(page.locator('#completion-notification')).toBeVisible({
+      timeout: 6000,
+    });
+    await expect(page.locator('#completion-notification')).toContainText(
+      'All eight discoveries found!',
+    );
+    await expect(page.locator('#achievement-notification')).toBeHidden();
+    // A repeated claim must not create another completion toast.
+    await consoleClaim(page);
+    if (last !== 'source') await page.locator('#discoveries-toggle').click();
+    await page.locator('#reset-discoveries').click();
+    await expect(page.locator('#discovery-count')).toHaveText('0/8');
+    await expect(page.locator('#discovery-star')).toBeHidden();
+    await expect(page.locator('#completion-notification')).toBeHidden();
+  });
+}
+
+test('completed progress restores the star without replaying the celebration', async ({
+  page,
+}) => {
+  await page.addInitScript((key) => {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        awarded: [
+          'language',
+          'keyboard',
+          'skip',
+          'story',
+          'light',
+          'bug',
+          'console',
+          'source',
+        ],
+        seen: [],
+      }),
+    );
+  }, storageKey);
+  await page.goto('/');
+  await expect(page.locator('#discovery-count')).toHaveText('8/8');
+  await expect(page.locator('#discovery-star')).toBeVisible();
+  await expect(page.locator('#completion-notification')).toBeHidden();
+  await consoleClaim(page);
+  await expect(page.locator('#completion-notification')).toBeHidden();
+  await page.reload();
+  await expect(page.locator('#discovery-star')).toBeVisible();
+  await expect(page.locator('#completion-notification')).toBeHidden();
 });

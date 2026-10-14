@@ -1,10 +1,12 @@
 ---
-import type { Translation } from '../content/types';
-
 interface Props {
-  content: Translation['contact'];
+  label: string;
+  title: string;
+  text: string;
+  cta: string;
+  github: string;
 }
-const { content } = Astro.props;
+const { label, title, text, cta, github } = Astro.props;
 ---
 
 <section
@@ -14,20 +16,20 @@ const { content } = Astro.props;
   data-discovery-section="contact"
 >
   <div class="wrap contact-inner">
-    <p class="eyebrow">{content.label}</p>
+    <p class="eyebrow">{label}</p>
     <h2 id="contact-heading">
-      {content.title.split('\n').map((line) => (
+      {title.split('\n').map((line) => (
         <span>{line}</span>
       ))}
     </h2>
-    <p>{content.text}</p>
+    <p>{text}</p>
     <div class="actions">
       <a class="button" href="https://www.linkedin.com/in/beeglebug/">
-        {content.cta}
+        {cta}
         <span aria-hidden="true">↗</span>
       </a>
       <a class="text-link" href="https://github.com/beeglebug">
-        {content.github}
+        {github}
         <span aria-hidden="true">↗</span>
       </a>
     </div>

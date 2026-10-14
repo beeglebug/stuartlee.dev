@@ -1,11 +1,15 @@
 ---
-import type { Translation, Locale } from '../content/types';
+import type { Locale } from '../content/types';
 
 interface Props {
   locale: Locale;
-  content: Translation['nav'];
+  label: string;
+  about: string;
+  approach: string;
+  projects: string;
+  languages: string;
 }
-const { locale, content } = Astro.props;
+const { locale, label, about, approach, projects, languages } = Astro.props;
 const base = locale === 'en' ? '/' : '/de/';
 ---
 
@@ -13,12 +17,12 @@ const base = locale === 'en' ? '/' : '/de/';
   <a class="wordmark" href={base} aria-label="Stuart Lee">
     <span>Stuart Lee</span>
   </a>
-  <nav aria-label={content.label} class="main-nav">
-    <a href="#about">{content.about}</a>
-    <a href="#approach">{content.approach}</a>
-    <a href="#projects">{content.projects}</a>
+  <nav aria-label={label} class="main-nav">
+    <a href="#about">{about}</a>
+    <a href="#approach">{approach}</a>
+    <a href="#projects">{projects}</a>
   </nav>
-  <nav class="language-nav" aria-label={content.languages}>
+  <nav class="language-nav" aria-label={languages}>
     <a
       href="/"
       lang="en"

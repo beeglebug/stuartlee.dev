@@ -1,22 +1,19 @@
 ---
-import type { Translation } from '../content/types';
-import ThemeControl from './ThemeControl.astro';
-import DiscoveriesDialog from './DiscoveriesDialog.astro';
-
 interface Props {
-  content: Translation['footer'];
-  theme: Translation['theme'];
-  game: Translation['game'];
+  text: string;
+  top: string;
+  discoveriesLabel: string;
+  completionLabel: string;
 }
-const { content, theme, game } = Astro.props;
+const { text, top, discoveriesLabel, completionLabel } = Astro.props;
 ---
 
 <footer class="site-footer wrap">
-  <ThemeControl content={theme} />
+  <slot name="appearance" />
   <div class="footer-row">
     <p>
       <span class="footer-name">Stuart Lee</span>
-      <span>{content.text}</span>
+      <span>{text}</span>
     </p>
     <div class="footer-actions">
       <button
@@ -26,14 +23,21 @@ const { content, theme, game } = Astro.props;
         aria-haspopup="dialog"
         hidden
       >
-        {game.control}
+        {discoveriesLabel}
         <span id="discovery-count"></span>
+        <span
+          id="discovery-star"
+          class="discovery-star"
+          aria-label={completionLabel}
+          hidden
+        >
+          ★
+        </span>
       </button>
       <a href="#top">
-        {content.top}
+        {top}
         <span aria-hidden="true">↑</span>
       </a>
     </div>
   </div>
 </footer>
-<DiscoveriesDialog content={game} />

@@ -8,6 +8,8 @@ import About from './About.astro';
 import Approach from './Approach.astro';
 import Projects from './Projects.astro';
 import Contact from './Contact.astro';
+import ThemeControl from './ThemeControl.astro';
+import DiscoveriesDialog from './DiscoveriesDialog.astro';
 import SiteFooter from './SiteFooter.astro';
 
 interface Props {
@@ -17,18 +19,93 @@ const { locale } = Astro.props;
 const content = translations[locale];
 ---
 
-<SiteLayout locale={locale} meta={content.meta} skipLabel={content.nav.skip}>
-  <SiteHeader locale={locale} content={content.nav} />
+<SiteLayout
+  locale={locale}
+  title={content.meta.title}
+  description={content.meta.description}
+  skipLabel={content.nav.skip}
+>
+  <SiteHeader
+    locale={locale}
+    label={content.nav.label}
+    about={content.nav.about}
+    approach={content.nav.approach}
+    projects={content.nav.projects}
+    languages={content.nav.languages}
+  />
   <main id="main" tabindex="-1">
-    <Hero content={content.hero} />
-    <About content={content.about} />
-    <Approach content={content.approach} />
-    <Projects content={content.projects} caseStudies={projects[locale]} />
-    <Contact content={content.contact} />
+    <Hero
+      eyebrow={content.hero.eyebrow}
+      title={content.hero.title}
+      intro={content.hero.intro}
+      contact={content.hero.contact}
+      more={content.hero.more}
+      note={content.hero.note}
+    />
+    <About
+      label={content.about.label}
+      title={content.about.title}
+      paragraphs={content.about.paragraphs}
+      caption={content.about.caption}
+      bugLabel={content.about.bugLabel}
+    />
+    <Approach
+      label={content.approach.label}
+      title={content.approach.title}
+      items={content.approach.items}
+    />
+    <Projects
+      label={content.projects.label}
+      title={content.projects.title}
+      status={content.projects.status}
+      intro={content.projects.intro}
+      note={content.projects.note}
+      fields={content.projects.fields}
+      caseStudies={projects[locale]}
+    />
+    <Contact
+      label={content.contact.label}
+      title={content.contact.title}
+      text={content.contact.text}
+      cta={content.contact.cta}
+      github={content.contact.github}
+    />
   </main>
   <SiteFooter
-    content={content.footer}
-    theme={content.theme}
-    game={content.game}
+    text={content.footer.text}
+    top={content.footer.top}
+    discoveriesLabel={content.game.control}
+    completionLabel={content.game.allComplete}
+  >
+    <ThemeControl
+      label={content.theme.label}
+      light={content.theme.light}
+      dark={content.theme.dark}
+      system={content.theme.system}
+      slot="appearance"
+    />
+  </SiteFooter>
+  <DiscoveriesDialog
+    close={content.game.close}
+    heading={content.game.heading}
+    intro={content.game.intro}
+    mainLabel={content.game.mainLabel}
+    bonusLabel={content.game.bonusLabel}
+    locked={content.game.locked}
+    unlocked={content.game.unlocked}
+    hint={content.game.hint}
+    sourceLabel={content.game.sourceLabel}
+    sourcePlaceholder={content.game.sourcePlaceholder}
+    submit={content.game.submit}
+    invalid={content.game.invalid}
+    sourceSuccess={content.game.sourceSuccess}
+    reset={content.game.reset}
+    resetDone={content.game.resetDone}
+    award={content.game.award}
+    explorer={content.game.explorer}
+    complete={content.game.complete}
+    consoleClue={content.game.consoleClue}
+    allComplete={content.game.allComplete}
+    achievements={content.game.achievements}
   />
 </SiteLayout>

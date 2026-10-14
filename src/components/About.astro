@@ -1,10 +1,12 @@
 ---
-import type { Translation } from '../content/types';
-
 interface Props {
-  content: Translation['about'];
+  label: string;
+  title: string;
+  paragraphs: string[];
+  caption: string;
+  bugLabel: string;
 }
-const { content } = Astro.props;
+const { label, title, paragraphs, caption, bugLabel } = Astro.props;
 ---
 
 <section
@@ -14,16 +16,38 @@ const { content } = Astro.props;
   data-discovery-section="about"
 >
   <div class="section-heading">
-    <p class="eyebrow">{content.label}</p>
+    <p class="eyebrow">{label}</p>
     <h2 id="about-heading">
-      {content.title.split('\n').map((line) => (
+      {title.split('\n').map((line) => (
         <span>{line}</span>
       ))}
     </h2>
-    <p class="section-caption">{content.caption}</p>
+    <p class="section-caption">{caption}</p>
+    <button
+      class="beeglebug"
+      id="beeglebug"
+      type="button"
+      aria-label={bugLabel}
+      hidden
+    >
+      <svg
+        viewBox="0 0 32 32"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="m12 8-3-4m11 4 3-4M9 13l-5-2m5 7H3m7 5-5 4m18-14 5-2m-5 7h6m-7 5 5 4" />
+        <ellipse cx="16" cy="18" rx="7" ry="10" />
+        <path d="M10 13h12m-6 0v15" />
+      </svg>
+    </button>
   </div>
   <div class="prose">
-    {content.paragraphs.map((p) => (
+    {paragraphs.map((p) => (
       <p>{p}</p>
     ))}
   </div>
