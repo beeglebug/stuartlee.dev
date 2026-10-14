@@ -1,109 +1,34 @@
 ---
-import { translations, projects, achievementIds, type Locale } from '../content/site';
-import '../styles/global.css';
-interface Props { locale: Locale }
+import type { Locale } from '../content/types';
+import { projects, translations } from '../content/site';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import SiteHeader from './SiteHeader.astro';
+import Hero from './Hero.astro';
+import About from './About.astro';
+import Approach from './Approach.astro';
+import Projects from './Projects.astro';
+import Contact from './Contact.astro';
+import SiteFooter from './SiteFooter.astro';
+
+interface Props {
+  locale: Locale;
+}
 const { locale } = Astro.props;
-const t = translations[locale];
-const base = locale === 'en' ? '/' : '/de/';
-const caseStudies = projects[locale];
-const canonical = new URL(base, Astro.site).href;
+const content = translations[locale];
 ---
-<!doctype html>
-<html lang={locale}>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f8fa" />
-    <script is:inline>
-      try {
-        const theme = localStorage.getItem('stuartlee:theme');
-        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
-      } catch { /* System appearance works without storage. */ }
-    </script>
-    <title>{t.meta.title}</title>
-    <meta name="description" content={t.meta.description} />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="en" href="https://stuartlee.dev/" />
-    <link rel="alternate" hreflang="de" href="https://stuartlee.dev/de/" />
-    <link rel="alternate" hreflang="x-default" href="https://stuartlee.dev/" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={t.meta.title} />
-    <meta property="og:description" content={t.meta.description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content={locale === 'en' ? 'en_GB' : 'de_DE'} />
-    <meta property="og:locale:alternate" content={locale === 'en' ? 'de_DE' : 'en_GB'} />
-    <meta property="og:image" content="https://stuartlee.dev/social-preview.png" />
-    <meta property="og:image:alt" content="Stuart Lee — Senior Frontend Engineer" />
-    <meta name="twitter:card" content="summary_large_image" />
-  </head>
-  <body data-locale={locale}>
-    <!-- Explorer's code / Entdecker-Code: BUILT-WITH-CARE. Enter it in Discoveries / Entdeckungen. -->
-    <a class="skip-link" href="#main" data-skip>{t.nav.skip}</a>
-    <header class="site-header wrap" id="top">
-      <a class="wordmark" href={base} aria-label="Stuart Lee"><span>Stuart Lee</span></a>
-      <nav aria-label={t.nav.label} class="main-nav">
-        <a href="#about">{t.nav.about}</a>
-        <a href="#approach">{t.nav.approach}</a>
-        <a href="#projects">{t.nav.projects}</a>
-      </nav>
-      <nav class="language-nav" aria-label={t.nav.languages}>
-        <a href="/" lang="en" hreflang="en" aria-current={locale === 'en' ? 'page' : undefined} data-language="en">English</a>
-        <span aria-hidden="true">/</span>
-        <a href="/de/" lang="de" hreflang="de" aria-current={locale === 'de' ? 'page' : undefined} data-language="de">Deutsch</a>
-      </nav>
-    </header>
-    <main id="main" tabindex="-1">
-      <section class="hero wrap" aria-labelledby="hero-heading" data-discovery-section="intro">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="blue-dot" aria-hidden="true"></span>{t.hero.eyebrow}</p>
-          <h1 id="hero-heading">{t.hero.title.split('\n').map((line, i) => <span class={i === 1 ? 'accent' : undefined}>{line}</span>)}</h1>
-          <p class="hero-intro">{t.hero.intro}</p>
-          <div class="actions">
-            <a class="button" href="https://www.linkedin.com/in/beeglebug/">{t.hero.contact}<span aria-hidden="true">↗</span></a>
-            <a class="text-link" href="#about">{t.hero.more}<span aria-hidden="true">↓</span></a>
-          </div>
-          <p class="hero-note">{t.hero.note}</p>
-        </div>
-      </section>
-      <section class="section wrap about-section" id="about" aria-labelledby="about-heading" data-discovery-section="about">
-        <div class="section-heading"><p class="eyebrow">{t.about.label}</p><h2 id="about-heading">{t.about.title.split('\n').map(line => <span>{line}</span>)}</h2><p class="section-caption">{t.about.caption}</p></div>
-        <div class="prose">{t.about.paragraphs.map(p => <p>{p}</p>)}</div>
-      </section>
-      <section class="section wrap approach-section" id="approach" aria-labelledby="approach-heading" data-discovery-section="approach">
-        <div class="section-heading"><p class="eyebrow">{t.approach.label}</p><h2 id="approach-heading">{t.approach.title.split('\n').map(line => <span>{line}</span>)}</h2></div>
-        <div class="principles">{t.approach.items.map((item, i) => <article class="principle"><span class="principle-number" aria-hidden="true">0{i + 1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></article>)}</div>
-      </section>
-      <section class="section wrap projects-section" id="projects" aria-labelledby="projects-heading" data-discovery-section="projects">
-        <div class="section-heading"><p class="eyebrow">{t.projects.label}</p><h2 id="projects-heading">{t.projects.title.split('\n').map(line => <span>{line}</span>)}</h2></div>
-        <div class="project-content">
-          {caseStudies.length === 0 ? <div class="coming-soon"><p class="small-label"><span class="status-mark" aria-hidden="true"></span>{t.projects.status}</p><p>{t.projects.intro}</p><p class="project-note">{t.projects.note}</p><a class="text-link" href="https://www.linkedin.com/in/beeglebug/">LinkedIn<span aria-hidden="true">↗</span></a></div> : caseStudies.map(project => <article class="case-study" id={project.id}><h3>{project.title}</h3><dl>{Object.entries(t.projects.fields).map(([key, label]) => <><dt>{label}</dt><dd>{project[key as keyof typeof t.projects.fields]}</dd></>)}</dl></article>)}
-        </div>
-      </section>
-      <section class="contact-section" id="contact" aria-labelledby="contact-heading" data-discovery-section="contact">
-        <div class="wrap contact-inner"><p class="eyebrow">{t.contact.label}</p><h2 id="contact-heading">{t.contact.title.split('\n').map(line => <span>{line}</span>)}</h2><p>{t.contact.text}</p><div class="actions"><a class="button" href="https://www.linkedin.com/in/beeglebug/">{t.contact.cta}<span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/beeglebug">{t.contact.github}<span aria-hidden="true">↗</span></a></div></div>
-      </section>
-    </main>
-    <footer class="site-footer wrap">
-      <div class="theme-control" role="group" aria-label={t.theme.label} hidden>
-        <span>{t.theme.label}</span>
-        {(['light', 'dark', 'system'] as const).map(theme => <button type="button" data-theme-choice={theme} aria-pressed={theme === 'system' ? 'true' : 'false'}>{t.theme[theme]}</button>)}
-      </div>
-      <div class="footer-row"><p><span class="footer-name">Stuart Lee</span><span>{t.footer.text}</span></p><div class="footer-actions"><button id="discoveries-toggle" aria-expanded="false" aria-controls="discoveries-panel" aria-haspopup="dialog" hidden>{t.game.control}<span id="discovery-count"></span></button><a href="#top">{t.footer.top}<span aria-hidden="true">↑</span></a></div></div>
-      <dialog id="discoveries-panel" aria-labelledby="discoveries-heading" class="discoveries-panel">
-        <button id="discoveries-close" class="dialog-close" type="button" autofocus>{t.game.close}<span aria-hidden="true">×</span></button>
-        <h2 id="discoveries-heading">{t.game.heading}</h2><p>{t.game.intro}</p>
-        <div id="explorer-badge" class="explorer-badge" hidden><strong>✦ {t.game.explorer}</strong><p>{t.game.complete}</p></div>
-        {[false, true].map(bonus => <div class="achievement-group"><h3>{bonus ? t.game.bonusLabel : t.game.mainLabel}</h3><ul class="achievement-list">{achievementIds.filter(id => (id === 'console' || id === 'source') === bonus).map(id => <li data-achievement={id}><div class="achievement-title"><span class="achievement-mark" aria-hidden="true">○</span><h4>{t.game.achievements[id].title}</h4><span class="achievement-state">{t.game.locked}</span></div><details><summary>{t.game.hint}</summary><p>{t.game.achievements[id].hint}</p></details></li>)}</ul></div>)}
-        <form id="source-form" class="source-form"><label for="source-code">{t.game.sourceLabel}</label><div><input id="source-code" name="code" type="text" autocomplete="off" spellcheck="false" placeholder={t.game.sourcePlaceholder} aria-describedby="source-feedback" /><button class="button" type="submit">{t.game.submit}</button></div><p id="source-feedback" role="status"></p></form>
-        <button id="reset-discoveries" class="reset-button" type="button">{t.game.reset}</button>
-      </dialog>
-    </footer>
-    <div id="achievement-notification" class="notification" role="status" aria-live="polite" aria-atomic="true"></div>
-    <script id="game-translations" type="application/json" set:html={JSON.stringify(t.game).replace(/</g, '\\u003c')} />
-    <script>
-      import '../scripts/achievements';
-      import '../scripts/theme';
-    </script>
-  </body>
-</html>
+
+<SiteLayout locale={locale} meta={content.meta} skipLabel={content.nav.skip}>
+  <SiteHeader locale={locale} content={content.nav} />
+  <main id="main" tabindex="-1">
+    <Hero content={content.hero} />
+    <About content={content.about} />
+    <Approach content={content.approach} />
+    <Projects content={content.projects} caseStudies={projects[locale]} />
+    <Contact content={content.contact} />
+  </main>
+  <SiteFooter
+    content={content.footer}
+    theme={content.theme}
+    game={content.game}
+  />
+</SiteLayout>

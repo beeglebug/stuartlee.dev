@@ -1,0 +1,54 @@
+---
+import type { Translation, Project } from '../content/types';
+
+interface Props {
+  content: Translation['projects'];
+  caseStudies: Project[];
+}
+const { content, caseStudies } = Astro.props;
+---
+
+<section
+  class="section wrap projects-section"
+  id="projects"
+  aria-labelledby="projects-heading"
+  data-discovery-section="projects"
+>
+  <div class="section-heading">
+    <p class="eyebrow">{content.label}</p>
+    <h2 id="projects-heading">
+      {content.title.split('\n').map((line) => (
+        <span>{line}</span>
+      ))}
+    </h2>
+  </div>
+  <div class="project-content">
+    {caseStudies.length === 0 ? (
+      <div class="coming-soon">
+        <p class="small-label">
+          <span class="status-mark" aria-hidden="true"></span>
+          {content.status}
+        </p>
+        <p>{content.intro}</p>
+        <p class="project-note">{content.note}</p>
+        <a class="text-link" href="https://www.linkedin.com/in/beeglebug/">
+          LinkedIn<span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    ) : (
+      caseStudies.map((project) => (
+        <article class="case-study" id={project.id}>
+          <h3>{project.title}</h3>
+          <dl>
+            {Object.entries(content.fields).map(([key, label]) => (
+              <>
+                <dt>{label}</dt>
+                <dd>{project[key as keyof typeof content.fields]}</dd>
+              </>
+            ))}
+          </dl>
+        </article>
+      ))
+    )}
+  </div>
+</section>

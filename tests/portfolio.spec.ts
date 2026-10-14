@@ -3,7 +3,10 @@ import AxeBuilder from '@axe-core/playwright';
 
 const storageKey = 'stuartlee:discoveries:v1';
 async function awards(page: Page): Promise<string[]> {
-  return page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').awarded || [], storageKey);
+  return page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) || '{}').awarded || [],
+    storageKey,
+  );
 }
 async function consoleClaim(page: Page) {
   return page.evaluate(() => window.helloThere());
@@ -15,117 +18,194 @@ async function keyboardSkip(page: Page, webkit = false) {
 }
 
 for (const route of ['/', '/de/']) {
-  test(`content, metadata, mobile layouts and accessibility: ${route}`, async ({ page }) => {
+  test(`content, metadata, mobile layouts and accessibility: ${route}`, async ({
+    page,
+  }) => {
     await page.goto(route);
-    await expect(page.locator('html')).toHaveAttribute('lang', route === '/' ? 'en' : 'de');
+    await expect(page.locator('html')).toHaveAttribute(
+      'lang',
+      route === '/' ? 'en' : 'de',
+    );
     await expect(page).toHaveTitle('Stuart Lee — Senior Frontend Engineer');
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://stuartlee.dev${route}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://stuartlee.dev${route}`,
+    );
     await expect(page.locator('#discoveries-toggle')).toBeHidden();
-    await expect(page.getByRole('link', { name: 'LinkedIn', exact: true })).toHaveAttribute('href', 'https://www.linkedin.com/in/beeglebug/');
+    await expect(
+      page.getByRole('link', { name: 'LinkedIn', exact: true }),
+    ).toHaveAttribute('href', 'https://www.linkedin.com/in/beeglebug/');
     for (const width of [320, 375, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
     }
-    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
     expect(results.violations).toEqual([]);
     await consoleClaim(page);
     await page.locator('#discoveries-toggle').click();
-    expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });
     for (const width of [320, 640]) {
       await page.setViewportSize({ width, height: 900 });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
     }
   });
 }
 
-test('language arrival, clean URLs and progress across locales', async ({ page }) => {
+test('language arrival, clean URLs and progress across locales', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   await expect(page).toHaveURL(/\/de\/$/);
   expect(await awards(page)).toContain('language');
-  await expect(page.locator('#achievement-notification')).toContainText('Hallo!');
+  await expect(page.locator('#achievement-notification')).toContainText(
+    'Hallo!',
+  );
   await page.getByRole('link', { name: 'English', exact: true }).click();
   await expect(page).toHaveURL(/4322\/$/);
-  expect((await awards(page)).filter(id => id === 'language')).toHaveLength(1);
+  expect((await awards(page)).filter((id) => id === 'language')).toHaveLength(
+    1,
+  );
   await page.reload();
   await expect(page.locator('#discoveries-toggle')).toBeVisible();
   await page.goto('/?explore=en');
-  expect((await awards(page)).filter(id => id === 'language')).toHaveLength(1);
+  expect((await awards(page)).filter((id) => id === 'language')).toHaveLength(
+    1,
+  );
   await expect(page).toHaveURL(/4322\/$/);
 });
 
-test('keyboard and skip achievements require real activation', async ({ page }, testInfo) => {
+test('keyboard and skip achievements require real activation', async ({
+  page,
+}, testInfo) => {
   await page.goto('/');
   await page.locator('.main-nav a').first().click();
   expect(await awards(page)).not.toContain('keyboard');
   await page.goto('/');
-  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press(
+    testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
+  );
   expect(await awards(page)).not.toContain('keyboard');
   await page.keyboard.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
   expect(await awards(page)).toContain('skip');
   expect(await awards(page)).not.toContain('keyboard');
-  await expect(page.locator('#achievement-notification')).toContainText('Skip ahead');
+  await expect(page.locator('#achievement-notification')).toContainText(
+    'Skip ahead',
+  );
   await page.locator('[data-theme-choice="light"]').focus();
-  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press(
+    testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
+  );
   await page.keyboard.press('Space');
   expect(await awards(page)).toContain('keyboard');
   // A programmatically dispatched event cannot claim keyboard navigation.
-  await page.locator('#reset-discoveries').evaluate(element => (element as HTMLElement).click());
-  await page.locator('.main-nav a').first().evaluate(element => {
-    (element as HTMLElement).focus();
-    element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-    (element as HTMLElement).click();
-  });
+  await page
+    .locator('#reset-discoveries')
+    .evaluate((element) => (element as HTMLElement).click());
+  await page
+    .locator('.main-nav a')
+    .first()
+    .evaluate((element) => {
+      (element as HTMLElement).focus();
+      element.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      );
+      (element as HTMLElement).click();
+    });
   expect(await awards(page)).not.toContain('keyboard');
 });
 
 test('console, source codes, duplicates and reset', async ({ page }) => {
   const consoleMessages: string[] = [];
-  page.on('console', message => consoleMessages.push(message.text()));
+  page.on('console', (message) => consoleMessages.push(message.text()));
   await page.goto('/');
-  expect(consoleMessages.some(message => message.includes('helloThere()'))).toBe(true);
+  expect(
+    consoleMessages.some((message) => message.includes('helloThere()')),
+  ).toBe(true);
   expect(await page.evaluate(() => 'portfolio' in window)).toBe(false);
   expect(await consoleClaim(page)).toBe(true);
   expect(await consoleClaim(page)).toBe(false);
   await page.locator('#discoveries-toggle').click();
-  await expect(page.locator('#discoveries-toggle')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#discoveries-toggle')).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
   await page.locator('#source-code').fill('wrong');
   await page.locator('#source-form button').click();
-  await expect(page.locator('#source-code')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#source-code')).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  );
   expect(await awards(page)).not.toContain('source');
   const source = await (await page.request.get('/')).text();
   expect(source).toContain('<!-- Explorer');
   const code = source.match(/Entdecker-Code: ([A-Z-]+)\./)![1];
   await page.locator('#source-code').fill(` ${code.toLowerCase()} `);
   await page.locator('#source-form button').click();
-  expect(await awards(page)).toEqual(expect.arrayContaining(['console', 'source']));
+  expect(await awards(page)).toEqual(
+    expect.arrayContaining(['console', 'source']),
+  );
   await page.locator('#source-form button').click();
-  expect((await awards(page)).filter(id => id === 'source')).toHaveLength(1);
+  expect((await awards(page)).filter((id) => id === 'source')).toHaveLength(1);
   await expect(page.locator('#explorer-badge')).toBeHidden();
   await page.reload();
   await page.locator('#discoveries-toggle').click();
-  await expect(page.locator('[data-achievement="source"]')).toHaveAttribute('data-unlocked', '');
+  await expect(page.locator('[data-achievement="source"]')).toHaveAttribute(
+    'data-unlocked',
+    '',
+  );
   await page.locator('#reset-discoveries').click();
   expect(await awards(page)).toEqual([]);
   await expect(page.locator('#source-code')).toHaveValue('');
   await expect(page.locator('#discoveries-toggle')).toBeVisible();
 });
 
-test('all main discoveries earn the badge without developer bonuses', async ({ page }, testInfo) => {
+test('all main discoveries earn the badge without developer bonuses', async ({
+  page,
+}, testInfo) => {
   await page.goto('/');
   await keyboardSkip(page, testInfo.project.name === 'webkit');
   await page.locator('[data-theme-choice="light"]').focus();
-  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press(
+    testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
+  );
   await page.keyboard.press('Space');
   await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
-    await page.locator(`[data-discovery-section="${id}"]`).scrollIntoViewIfNeeded();
-    await expect.poll(async () => page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').seen || [], storageKey)).toContain(id);
+    await page
+      .locator(`[data-discovery-section="${id}"]`)
+      .scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () =>
+        page.evaluate(
+          (key) => JSON.parse(localStorage.getItem(key) || '{}').seen || [],
+          storageKey,
+        ),
+      )
+      .toContain(id);
   }
-  expect(await awards(page)).toEqual(expect.arrayContaining(['language', 'keyboard', 'skip', 'story']));
+  expect(await awards(page)).toEqual(
+    expect.arrayContaining(['language', 'keyboard', 'skip', 'story']),
+  );
   expect(await awards(page)).not.toContain('console');
   await page.locator('#discoveries-toggle').click();
   await expect(page.locator('#explorer-badge')).toBeVisible();
@@ -134,28 +214,47 @@ test('all main discoveries earn the badge without developer bonuses', async ({ p
   await expect(page.locator('#explorer-badge')).toBeVisible();
 });
 
-test('storage failures and malformed saved data do not break the site', async ({ page }) => {
+test('storage failures and malformed saved data do not break the site', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
-    Storage.prototype.getItem = () => { throw new Error('blocked'); };
-    Storage.prototype.setItem = () => { throw new Error('blocked'); };
+    Storage.prototype.getItem = () => {
+      throw new Error('blocked');
+    };
+    Storage.prototype.setItem = () => {
+      throw new Error('blocked');
+    };
   });
   const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
+  page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   await expect(page.locator('#discoveries-toggle')).toBeVisible();
   await page.locator('#discoveries-toggle').click();
-  await expect(page.locator('[data-achievement="language"]')).toHaveAttribute('data-unlocked', '');
+  await expect(page.locator('[data-achievement="language"]')).toHaveAttribute(
+    'data-unlocked',
+    '',
+  );
   expect(await consoleClaim(page)).toBe(true);
   expect(await consoleClaim(page)).toBe(false);
   await page.locator('#reset-discoveries').click();
-  await expect(page.locator('[data-achievement="console"]')).not.toHaveAttribute('data-unlocked', '');
+  await expect(
+    page.locator('[data-achievement="console"]'),
+  ).not.toHaveAttribute('data-unlocked', '');
   expect(errors).toEqual([]);
 });
 
-for (const saved of ['{broken', 'null', '[]', '{"awarded":["fake",null],"seen":["fake"]}']) {
+for (const saved of [
+  '{broken',
+  'null',
+  '[]',
+  '{"awarded":["fake",null],"seen":["fake"]}',
+]) {
   test(`invalid stored progress is ignored: ${saved}`, async ({ page }) => {
-    await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key: storageKey, value: saved });
+    await page.addInitScript(
+      ({ key, value }) => localStorage.setItem(key, value),
+      { key: storageKey, value: saved },
+    );
     await page.goto('/');
     expect(await consoleClaim(page)).toBe(true);
     expect(await awards(page)).toEqual(['console']);
@@ -174,7 +273,9 @@ test('no-JavaScript content and locale navigation', async ({ browser }) => {
   await context.close();
 });
 
-test('same-locale and invalid arrival tokens do not award language', async ({ page }) => {
+test('same-locale and invalid arrival tokens do not award language', async ({
+  page,
+}) => {
   for (const query of ['en', 'invalid']) {
     await page.goto(`/?explore=${query}`);
     expect(await awards(page)).not.toContain('language');
@@ -182,33 +283,54 @@ test('same-locale and invalid arrival tokens do not award language', async ({ pa
   }
 });
 
-test('Space activates a button after native Tab focus', async ({ page }, testInfo) => {
+test('Space activates a button after native Tab focus', async ({
+  page,
+}, testInfo) => {
   await page.goto('/');
   await consoleClaim(page);
   // Start before the control, then reach it through actual native navigation.
   await page.locator('#discoveries-toggle').focus();
   const tab = testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab';
-  const reverseTab = testInfo.project.name === 'webkit' ? 'Alt+Shift+Tab' : 'Shift+Tab';
+  const reverseTab =
+    testInfo.project.name === 'webkit' ? 'Alt+Shift+Tab' : 'Shift+Tab';
   await page.keyboard.press(tab);
   await page.keyboard.press(reverseTab);
   await expect(page.locator('#discoveries-toggle')).toBeFocused();
   expect(await awards(page)).not.toContain('keyboard');
   await page.keyboard.press('Space');
-  await expect(page.locator('#discoveries-toggle')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#discoveries-toggle')).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
   expect(await awards(page)).toContain('keyboard');
 });
 
-test('section discovery works without IntersectionObserver', async ({ page }) => {
-  await page.addInitScript(() => { Object.defineProperty(window, 'IntersectionObserver', { value: undefined }); });
+test('section discovery works without IntersectionObserver', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'IntersectionObserver', { value: undefined });
+  });
   await page.goto('/');
   for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
-    await page.locator(`[data-discovery-section="${id}"]`).scrollIntoViewIfNeeded();
-    await expect.poll(async () => page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').seen || [], storageKey)).toContain(id);
+    await page
+      .locator(`[data-discovery-section="${id}"]`)
+      .scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () =>
+        page.evaluate(
+          (key) => JSON.parse(localStorage.getItem(key) || '{}').seen || [],
+          storageKey,
+        ),
+      )
+      .toContain(id);
   }
   expect(await awards(page)).toContain('story');
 });
 
-test('discoveries modal closes and restores focus without moving the page', async ({ page }) => {
+test('discoveries modal closes and restores focus without moving the page', async ({
+  page,
+}) => {
   await page.goto('/');
   await consoleClaim(page);
   await page.locator('#discoveries-toggle').scrollIntoViewIfNeeded();
@@ -221,43 +343,83 @@ test('discoveries modal closes and restores focus without moving the page', asyn
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.locator('#discoveries-toggle')).toBeFocused();
-  await expect(page.locator('#discoveries-toggle')).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#discoveries-toggle')).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
   expect(await page.evaluate(() => scrollY)).toBe(scroll);
   await page.locator('#discoveries-toggle').click();
   await page.locator('#discoveries-close').click();
   await expect(page.getByRole('dialog')).toBeHidden();
 });
 
-test('appearance buttons support Space before any discoveries', async ({ page }, testInfo) => {
+test('appearance buttons support Space before any discoveries', async ({
+  page,
+}, testInfo) => {
   await page.goto('/');
   await page.locator('[data-theme-choice="light"]').focus();
-  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press(
+    testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
+  );
   await expect(page.locator('[data-theme-choice="dark"]')).toBeFocused();
   await page.keyboard.press('Space');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   expect(await awards(page)).toContain('keyboard');
 });
 
-test('appearance follows system, persists overrides and passes dark accessibility', async ({ page }) => {
+test('appearance follows system, persists overrides and passes dark accessibility', async ({
+  page,
+}) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/');
-  await expect(page.locator('[data-theme-choice="system"]')).toHaveAttribute('aria-pressed', 'true');
-  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
+  await expect(page.locator('[data-theme-choice="system"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  expect(
+    await page
+      .locator('html')
+      .evaluate((element) => getComputedStyle(element).colorScheme),
+  ).toBe('dark');
   await page.locator('[data-theme-choice="light"]').click();
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.emulateMedia({ colorScheme: 'light' });
   await page.locator('[data-theme-choice="dark"]').click();
   await page.reload();
-  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
-  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  expect(
+    await page
+      .locator('html')
+      .evaluate((element) => getComputedStyle(element).colorScheme),
+  ).toBe('dark');
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
   await consoleClaim(page);
   await page.locator('#discoveries-toggle').click();
-  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
   await page.keyboard.press('Escape');
   await page.locator('[data-theme-choice="system"]').click();
   await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
-  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('light');
+  expect(
+    await page
+      .locator('html')
+      .evaluate((element) => getComputedStyle(element).colorScheme),
+  ).toBe('light');
   await page.emulateMedia({ colorScheme: 'dark' });
-  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
+  expect(
+    await page
+      .locator('html')
+      .evaluate((element) => getComputedStyle(element).colorScheme),
+  ).toBe('dark');
 });

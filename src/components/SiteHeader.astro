@@ -1,0 +1,42 @@
+---
+import type { Translation, Locale } from '../content/types';
+
+interface Props {
+  locale: Locale;
+  content: Translation['nav'];
+}
+const { locale, content } = Astro.props;
+const base = locale === 'en' ? '/' : '/de/';
+---
+
+<header class="site-header wrap" id="top">
+  <a class="wordmark" href={base} aria-label="Stuart Lee">
+    <span>Stuart Lee</span>
+  </a>
+  <nav aria-label={content.label} class="main-nav">
+    <a href="#about">{content.about}</a>
+    <a href="#approach">{content.approach}</a>
+    <a href="#projects">{content.projects}</a>
+  </nav>
+  <nav class="language-nav" aria-label={content.languages}>
+    <a
+      href="/"
+      lang="en"
+      hreflang="en"
+      aria-current={locale === 'en' ? 'page' : undefined}
+      data-language="en"
+    >
+      English
+    </a>
+    <span aria-hidden="true">/</span>
+    <a
+      href="/de/"
+      lang="de"
+      hreflang="de"
+      aria-current={locale === 'de' ? 'page' : undefined}
+      data-language="de"
+    >
+      Deutsch
+    </a>
+  </nav>
+</header>

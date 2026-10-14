@@ -1,16 +1,29 @@
-import { achievementIds, mainAchievements, type AchievementId, type Locale, type Translation } from '../content/site';
+import { initialiseKeyboardDiscovery } from './keyboard-discovery';
+import { initialiseDiscoveriesDialog } from './discoveries-dialog';
+import {
+  achievementIds,
+  mainAchievements,
+  type AchievementId,
+  type Locale,
+  type Translation,
+} from '../content/site';
 
 declare global {
-  interface Window { helloThere: () => boolean }
+  interface Window {
+    helloThere: () => boolean;
+  }
 }
 
 const storageKey = 'stuartlee:discoveries:v1';
 const sectionIds = ['intro', 'about', 'approach', 'projects', 'contact'];
 const sourceCode = 'BUILT-WITH-CARE';
 const locale = document.body.dataset.locale as Locale;
-const t = JSON.parse(document.getElementById('game-translations')!.textContent!) as Translation['game'];
-const toggle = document.getElementById('discoveries-toggle') as HTMLButtonElement;
-const panel = document.getElementById('discoveries-panel') as HTMLDialogElement;
+const t = JSON.parse(
+  document.getElementById('game-translations')!.textContent!,
+) as Translation['game'];
+const toggle = document.getElementById(
+  'discoveries-toggle',
+) as HTMLButtonElement;
 const notification = document.getElementById('achievement-notification')!;
 const badge = document.getElementById('explorer-badge')!;
 const feedback = document.getElementById('source-feedback')!;
@@ -26,31 +39,48 @@ try {
   if (saved && typeof saved === 'object') {
     const state = saved as { awarded?: unknown; seen?: unknown };
     if (Array.isArray(state.awarded)) {
-      state.awarded.forEach(id => {
+      state.awarded.forEach((id) => {
         if (achievementIds.includes(id)) awarded.add(id as AchievementId);
       });
     }
     if (Array.isArray(state.seen)) {
-      state.seen.forEach(id => { if (sectionIds.includes(id)) seen.add(id); });
+      state.seen.forEach((id) => {
+        if (sectionIds.includes(id)) seen.add(id);
+      });
     }
   }
-} catch { /* Fall back to in-memory progress. */ }
+} catch {
+  /* Fall back to in-memory progress. */
+}
 
 function save() {
-  try { localStorage.setItem(storageKey, JSON.stringify({ awarded: [...awarded], seen: [...seen] })); }
-  catch { /* Keep the in-memory state. */ }
+  try {
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({ awarded: [...awarded], seen: [...seen] }),
+    );
+  } catch {
+    /* Keep the in-memory state. */
+  }
 }
-function complete() { return mainAchievements.every(id => awarded.has(id)); }
+function complete() {
+  return mainAchievements.every((id) => awarded.has(id));
+}
 function render() {
   // Keep the control available after a reset, so it doesn't disappear beneath focus.
   if (awarded.size) toggle.hidden = false;
-  document.getElementById('discovery-count')!.textContent = `${awarded.size}/${achievementIds.length}`;
+  document.getElementById('discovery-count')!.textContent =
+    `${awarded.size}/${achievementIds.length}`;
   for (const id of achievementIds) {
-    const item = document.querySelector<HTMLElement>(`[data-achievement="${id}"]`)!;
+    const item = document.querySelector<HTMLElement>(
+      `[data-achievement="${id}"]`,
+    )!;
     const unlocked = awarded.has(id);
     item.toggleAttribute('data-unlocked', unlocked);
     item.querySelector('.achievement-mark')!.textContent = unlocked ? '✓' : '○';
-    item.querySelector('.achievement-state')!.textContent = unlocked ? t.unlocked : t.locked;
+    item.querySelector('.achievement-state')!.textContent = unlocked
+      ? t.unlocked
+      : t.locked;
   }
   badge.hidden = !complete();
 }
@@ -64,7 +94,9 @@ function announce(message: string) {
     notification.textContent = pendingAnnouncements.join(' ');
     pendingAnnouncements = [];
     announcementTimer = undefined;
-    noticeTimer = setTimeout(() => { notification.textContent = ''; }, 7000);
+    noticeTimer = setTimeout(() => {
+      notification.textContent = '';
+    }, 7000);
   }, 0);
 }
 function award(id: AchievementId): boolean {
@@ -73,53 +105,32 @@ function award(id: AchievementId): boolean {
   awarded.add(id);
   save();
   render();
-  announce(`${t.award} ${t.achievements[id].title}${!wasComplete && complete() ? ` — ${t.explorer}. ${t.complete}` : ''}`);
+  announce(
+    `${t.award} ${t.achievements[id].title}${!wasComplete && complete() ? ` — ${t.explorer}. ${t.complete}` : ''}`,
+  );
   return true;
 }
 
 render();
-toggle.addEventListener('click', () => {
-  panel.showModal();
-  toggle.setAttribute('aria-expanded', 'true');
-  document.body.classList.add('dialog-open');
-});
-
-document.getElementById('discoveries-close')!.addEventListener('click', () => panel.close());
-panel.addEventListener('click', event => {
-  if (event.target !== panel) return;
-  const bounds = panel.getBoundingClientRect();
-  if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) panel.close();
-});
-panel.addEventListener('keydown', event => {
-  if (event.key !== 'Tab') return;
-  const controls = [...panel.querySelectorAll<HTMLElement>('button, input, summary, a[href]')]
-    .filter(element => element.getClientRects().length > 0);
-  const first = controls[0];
-  const last = controls[controls.length - 1];
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  }
-});
-panel.addEventListener('close', () => {
-  toggle.setAttribute('aria-expanded', 'false');
-  document.body.classList.remove('dialog-open');
-  toggle.focus({ preventScroll: true });
-});
+initialiseDiscoveriesDialog();
 
 // A navigation token proves arrival at the destination, works across tabs, and
 // doesn't depend on storage. Remove it immediately so it isn't copied into links.
 const currentUrl = new URL(location.href);
 const fromLocale = currentUrl.searchParams.get('explore');
-if ((fromLocale === 'en' || fromLocale === 'de') && fromLocale !== locale) award('language');
+if ((fromLocale === 'en' || fromLocale === 'de') && fromLocale !== locale)
+  award('language');
 if (currentUrl.searchParams.has('explore')) {
   currentUrl.searchParams.delete('explore');
-  history.replaceState(history.state, '', currentUrl.pathname + currentUrl.search + currentUrl.hash);
+  history.replaceState(
+    history.state,
+    '',
+    currentUrl.pathname + currentUrl.search + currentUrl.hash,
+  );
 }
-for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-language]')) {
+for (const link of document.querySelectorAll<HTMLAnchorElement>(
+  'a[data-language]',
+)) {
   if (link.dataset.language !== locale) {
     const destination = new URL(link.href);
     destination.searchParams.set('explore', locale);
@@ -132,68 +143,40 @@ document.querySelector('[data-skip]')!.addEventListener('click', () => {
   award('skip');
 });
 
-let waitingForTabFocus = false;
-let tabFocused: Element | null = null;
-let activationTarget: Element | null = null;
-document.addEventListener('pointerdown', () => {
-  waitingForTabFocus = false;
-  tabFocused = null;
-  activationTarget = null;
-});
-document.addEventListener('keydown', event => {
-  if (!event.isTrusted) return;
-  if (event.key === 'Tab') {
-    waitingForTabFocus = true;
-    tabFocused = null;
-    activationTarget = null;
-    return;
-  }
-  const target = event.target;
-  if (!(target instanceof HTMLElement) || target !== tabFocused || target !== document.activeElement) return;
-  const link = target instanceof HTMLAnchorElement && target.hasAttribute('href');
-  const button = target instanceof HTMLButtonElement && !target.disabled;
-  if ((event.key === 'Enter' && (link || button)) || (event.key === ' ' && button)) activationTarget = target;
-});
-document.addEventListener('focusin', event => {
-  tabFocused = waitingForTabFocus && event.target instanceof Element ? event.target : null;
-  waitingForTabFocus = false;
-});
-document.addEventListener('click', event => {
-  if (!event.isTrusted) return;
-  const target = event.target instanceof Element ? event.target.closest('a, button') : null;
-  // Firefox reports detail=1 even for Enter-generated clicks. The preceding
-  // trusted key event and absence of pointer input establish keyboard use.
-  if (activationTarget && target === activationTarget && !target?.hasAttribute('data-skip')) award('keyboard');
-  activationTarget = null;
-});
-document.addEventListener('keyup', event => {
-  if (event.key === 'Enter' || event.key === ' ') {
-    // Native Space activation may click on keyup; expire unused attempts after it.
-    setTimeout(() => { activationTarget = null; }, 0);
-  }
-});
+initialiseKeyboardDiscovery(() => award('keyboard'));
 
-const sections = [...document.querySelectorAll<HTMLElement>('[data-discovery-section]')];
+const sections = [
+  ...document.querySelectorAll<HTMLElement>('[data-discovery-section]'),
+];
 function recordVisibleSections() {
   for (const section of sections) {
     const bounds = section.getBoundingClientRect();
-    const visible = Math.min(bounds.bottom, innerHeight) - Math.max(bounds.top, 0);
-    if (visible >= Math.min(120, bounds.height * .5)) {
+    const visible =
+      Math.min(bounds.bottom, innerHeight) - Math.max(bounds.top, 0);
+    if (visible >= Math.min(120, bounds.height * 0.5)) {
       const id = section.dataset.discoverySection!;
-      if (!seen.has(id)) { seen.add(id); save(); }
+      if (!seen.has(id)) {
+        seen.add(id);
+        save();
+      }
     }
   }
-  if (sectionIds.every(id => seen.has(id))) award('story');
+  if (sectionIds.every((id) => seen.has(id))) award('story');
 }
 if (typeof window.IntersectionObserver === 'function') {
-  const observer = new IntersectionObserver(recordVisibleSections, { threshold: [0, .1, .2, .3, .5, 1] });
-  sections.forEach(section => observer.observe(section));
+  const observer = new IntersectionObserver(recordVisibleSections, {
+    threshold: [0, 0.1, 0.2, 0.3, 0.5, 1],
+  });
+  sections.forEach((section) => observer.observe(section));
 } else {
   let scheduled = false;
   const schedule = () => {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => { scheduled = false; recordVisibleSections(); });
+    requestAnimationFrame(() => {
+      scheduled = false;
+      recordVisibleSections();
+    });
   };
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
@@ -203,7 +186,7 @@ recordVisibleSections();
 window.helloThere = () => award('console');
 console.info(`Stuart Lee — ${t.consoleClue}`);
 
-document.getElementById('source-form')!.addEventListener('submit', event => {
+document.getElementById('source-form')!.addEventListener('submit', (event) => {
   event.preventDefault();
   const input = document.getElementById('source-code') as HTMLInputElement;
   const valid = input.value.trim().toUpperCase() === sourceCode;

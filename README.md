@@ -25,11 +25,26 @@ npm test
 
 Tests preview the production build, so run `npm run build` first. Automated accessibility checks are complemented by manual keyboard, zoom and screen-reader review; they do not constitute an accessibility certification.
 
+## Source layout
+
+- `src/pages/` — English and German route entry points.
+- `src/layouts/SiteLayout.astro` — document structure, metadata and initial appearance.
+- `src/components/Portfolio.astro` — assembles the page from section components.
+- `src/components/` — page sections, navigation, footer, theme control and discoveries dialog.
+- `src/content/` — translated copy, shared types and project data.
+- `src/scripts/` — browser behaviour for discoveries, the dialog and appearance.
+- `src/styles/global.css` — shared styles and light/dark colour tokens.
+- `tests/portfolio.spec.ts` — behaviour, responsive layout and accessibility checks in Chromium, Firefox and WebKit.
+
+Astro renders the pages to static HTML at build time. Small TypeScript modules handle browser interactions; there is no React runtime or request-time server rendering.
+
+VS Code will recommend the Astro and Prettier extensions when opening this repository. Run `npm run format` to format source files, or `npm run format:check` to check formatting without changing files.
+
 ## Content
 
-Edit `src/content/site.ts`. Both locales share typed content and the same components. German copy is a draft for review.
+Edit `src/content/locales/en.ts` or `src/content/locales/de.ts`. Both locales share the types in `src/content/types.ts` and the same components. German copy is a draft for review.
 
-The `projects` arrays are initially empty. Add an approved `Project` in each locale with the same stable `id`, and translated `title`, `context`, `contribution`, `decisions` and `outcomes`. Populated lists replace the coming-soon body. Update the section title and introduction when publishing real case studies. No sample outcomes are shown publicly.
+The `projects` arrays in `src/content/site.ts` are initially empty. Add an approved `Project` in each locale with the same stable `id`, and translated `title`, `context`, `contribution`, `decisions` and `outcomes`. Populated lists replace the coming-soon body. Update the section title and introduction when publishing real case studies. No sample outcomes are shown publicly.
 
 ## Deploy through Cloudflare
 

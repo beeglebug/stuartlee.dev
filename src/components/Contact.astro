@@ -1,0 +1,35 @@
+---
+import type { Translation } from '../content/types';
+
+interface Props {
+  content: Translation['contact'];
+}
+const { content } = Astro.props;
+---
+
+<section
+  class="contact-section"
+  id="contact"
+  aria-labelledby="contact-heading"
+  data-discovery-section="contact"
+>
+  <div class="wrap contact-inner">
+    <p class="eyebrow">{content.label}</p>
+    <h2 id="contact-heading">
+      {content.title.split('\n').map((line) => (
+        <span>{line}</span>
+      ))}
+    </h2>
+    <p>{content.text}</p>
+    <div class="actions">
+      <a class="button" href="https://www.linkedin.com/in/beeglebug/">
+        {content.cta}
+        <span aria-hidden="true">↗</span>
+      </a>
+      <a class="text-link" href="https://github.com/beeglebug">
+        {content.github}
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</section>

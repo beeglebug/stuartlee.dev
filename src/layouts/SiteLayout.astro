@@ -1,0 +1,63 @@
+---
+import type { Locale, Translation } from '../content/types';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  meta: Translation['meta'];
+  skipLabel: string;
+}
+const { locale, meta, skipLabel } = Astro.props;
+const base = locale === 'en' ? '/' : '/de/';
+const canonical = new URL(base, Astro.site).href;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <script is:inline>
+      try {
+        const theme = localStorage.getItem('stuartlee:theme');
+        if (theme === 'light' || theme === 'dark')
+          document.documentElement.dataset.theme = theme;
+      } catch {
+        /* System appearance works without storage. */
+      }
+    </script>
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href="https://stuartlee.dev/" />
+    <link rel="alternate" hreflang="de" href="https://stuartlee.dev/de/" />
+    <link rel="alternate" hreflang="x-default" href="https://stuartlee.dev/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={meta.title} />
+    <meta property="og:description" content={meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale === 'en' ? 'en_GB' : 'de_DE'} />
+    <meta
+      property="og:locale:alternate"
+      content={locale === 'en' ? 'de_DE' : 'en_GB'}
+    />
+    <meta
+      property="og:image"
+      content="https://stuartlee.dev/social-preview.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="Stuart Lee — Senior Frontend Engineer"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body data-locale={locale}>
+    <!-- Explorer's code / Entdecker-Code: BUILT-WITH-CARE. Enter it in Discoveries / Entdeckungen. -->
+    <a class="skip-link" href="#main" data-skip>
+      {skipLabel}
+    </a>
+    <slot />
+  </body>
+</html>

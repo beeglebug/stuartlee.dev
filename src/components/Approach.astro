@@ -1,0 +1,37 @@
+---
+import type { Translation } from '../content/types';
+
+interface Props {
+  content: Translation['approach'];
+}
+const { content } = Astro.props;
+---
+
+<section
+  class="section wrap approach-section"
+  id="approach"
+  aria-labelledby="approach-heading"
+  data-discovery-section="approach"
+>
+  <div class="section-heading">
+    <p class="eyebrow">{content.label}</p>
+    <h2 id="approach-heading">
+      {content.title.split('\n').map((line) => (
+        <span>{line}</span>
+      ))}
+    </h2>
+  </div>
+  <div class="principles">
+    {content.items.map((item, i) => (
+      <article class="principle">
+        <span class="principle-number" aria-hidden="true">
+          0{i + 1}
+        </span>
+        <div>
+          <h3>{item.title}</h3>
+          <p>{item.text}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

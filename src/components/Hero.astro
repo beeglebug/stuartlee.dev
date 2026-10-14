@@ -1,0 +1,38 @@
+---
+import type { Translation } from '../content/types';
+
+interface Props {
+  content: Translation['hero'];
+}
+const { content } = Astro.props;
+---
+
+<section
+  class="hero wrap"
+  aria-labelledby="hero-heading"
+  data-discovery-section="intro"
+>
+  <div class="hero-copy">
+    <p class="eyebrow">
+      <span class="blue-dot" aria-hidden="true"></span>
+      {content.eyebrow}
+    </p>
+    <h1 id="hero-heading">
+      {content.title.split('\n').map((line, i) => (
+        <span class={i === 1 ? 'accent' : undefined}>{line}</span>
+      ))}
+    </h1>
+    <p class="hero-intro">{content.intro}</p>
+    <div class="actions">
+      <a class="button" href="https://www.linkedin.com/in/beeglebug/">
+        {content.contact}
+        <span aria-hidden="true">↗</span>
+      </a>
+      <a class="text-link" href="#about">
+        {content.more}
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+    <p class="hero-note">{content.note}</p>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+---
+import type { Translation } from '../content/types';
+import ThemeControl from './ThemeControl.astro';
+import DiscoveriesDialog from './DiscoveriesDialog.astro';
+
+interface Props {
+  content: Translation['footer'];
+  theme: Translation['theme'];
+  game: Translation['game'];
+}
+const { content, theme, game } = Astro.props;
+---
+
+<footer class="site-footer wrap">
+  <ThemeControl content={theme} />
+  <div class="footer-row">
+    <p>
+      <span class="footer-name">Stuart Lee</span>
+      <span>{content.text}</span>
+    </p>
+    <div class="footer-actions">
+      <button
+        id="discoveries-toggle"
+        aria-expanded="false"
+        aria-controls="discoveries-panel"
+        aria-haspopup="dialog"
+        hidden
+      >
+        {game.control}
+        <span id="discovery-count"></span>
+      </button>
+      <a href="#top">
+        {content.top}
+        <span aria-hidden="true">↑</span>
+      </a>
+    </div>
+  </div>
+</footer>
+<DiscoveriesDialog content={game} />

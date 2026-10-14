@@ -1,0 +1,30 @@
+---
+import type { Translation } from '../content/types';
+
+interface Props {
+  content: Translation['about'];
+}
+const { content } = Astro.props;
+---
+
+<section
+  class="section wrap about-section"
+  id="about"
+  aria-labelledby="about-heading"
+  data-discovery-section="about"
+>
+  <div class="section-heading">
+    <p class="eyebrow">{content.label}</p>
+    <h2 id="about-heading">
+      {content.title.split('\n').map((line) => (
+        <span>{line}</span>
+      ))}
+    </h2>
+    <p class="section-caption">{content.caption}</p>
+  </div>
+  <div class="prose">
+    {content.paragraphs.map((p) => (
+      <p>{p}</p>
+    ))}
+  </div>
+</section>

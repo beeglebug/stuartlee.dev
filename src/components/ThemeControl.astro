@@ -1,0 +1,24 @@
+---
+import type { Translation } from '../content/types';
+
+interface Props {
+  content: Translation['theme'];
+}
+const { content } = Astro.props;
+---
+
+<div class="theme-control" role="group" aria-label={content.label} hidden>
+  <span>{content.label}</span>
+  {(['light', 'dark', 'system'] as const).map((theme) => (
+    <button
+      type="button"
+      data-theme-choice={theme}
+      aria-pressed={theme === 'system' ? 'true' : 'false'}
+    >
+      {content[theme]}
+    </button>
+  ))}
+</div>
+<script>
+  import '../scripts/theme';
+</script>
