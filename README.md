@@ -44,10 +44,14 @@ This repository has not been deployed by Codex.
 
 ## Discovery achievements
 
-Four exploration achievements earn an Explorer badge: switch locale, activate an element after Tab navigation, use the skip link, and view all five main sections. Two optional bonuses are earned through the console and a source comment. The first unlock exposes an inline achievements panel in the footer.
+Four exploration achievements earn an Explorer badge: switch locale, activate an element other than the skip link after Tab navigation, use the skip link, and view all five main sections. Two optional bonuses are earned through the console and a source comment. The first unlock exposes a control in the footer that opens the discoveries modal.
 
 Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. An ephemeral `explore` URL parameter records arrival after language switching, including when storage is unavailable, and is removed on arrival. Locale changes preserve saved achievements and section progress. Reset clears both.
 
 Keyboard navigation follows browser settings. On macOS Safari, use Option–Tab if ordinary Tab does not focus links; the site does not intercept or replace native navigation.
 
-The console exposes only `portfolio.claim("console")`. Source codes are playful discoveries, not secrets. HTML compression is disabled to retain the source clue. Without JavaScript, content, skip navigation and locale links work; game controls stay hidden.
+The console exposes only `helloThere()`. Source codes are playful discoveries, not secrets. HTML compression is disabled to retain the source clue. Without JavaScript, content, skip navigation and locale links work; game controls stay hidden.
+
+## Appearance
+
+Light, dark and system controls are in the footer. System is the default and follows OS changes. An explicit choice is stored locally under `stuartlee:theme` and applied before rendering. Without JavaScript, the site follows system appearance.

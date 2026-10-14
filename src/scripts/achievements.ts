@@ -1,7 +1,7 @@
 import { achievementIds, mainAchievements, type AchievementId, type Locale, type Translation } from '../content/site';
 
 declare global {
-  interface Window { portfolio: { claim: (name: string) => boolean } }
+  interface Window { helloThere: () => boolean }
 }
 
 const storageKey = 'stuartlee:discoveries:v1';
@@ -10,7 +10,7 @@ const sourceCode = 'BUILT-WITH-CARE';
 const locale = document.body.dataset.locale as Locale;
 const t = JSON.parse(document.getElementById('game-translations')!.textContent!) as Translation['game'];
 const toggle = document.getElementById('discoveries-toggle') as HTMLButtonElement;
-const panel = document.getElementById('discoveries-panel')!;
+const panel = document.getElementById('discoveries-panel') as HTMLDialogElement;
 const notification = document.getElementById('achievement-notification')!;
 const badge = document.getElementById('explorer-badge')!;
 const feedback = document.getElementById('source-feedback')!;
@@ -79,9 +79,35 @@ function award(id: AchievementId): boolean {
 
 render();
 toggle.addEventListener('click', () => {
-  const expanded = toggle.getAttribute('aria-expanded') === 'true';
-  toggle.setAttribute('aria-expanded', String(!expanded));
-  panel.hidden = expanded;
+  panel.showModal();
+  toggle.setAttribute('aria-expanded', 'true');
+  document.body.classList.add('dialog-open');
+});
+
+document.getElementById('discoveries-close')!.addEventListener('click', () => panel.close());
+panel.addEventListener('click', event => {
+  if (event.target !== panel) return;
+  const bounds = panel.getBoundingClientRect();
+  if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) panel.close();
+});
+panel.addEventListener('keydown', event => {
+  if (event.key !== 'Tab') return;
+  const controls = [...panel.querySelectorAll<HTMLElement>('button, input, summary, a[href]')]
+    .filter(element => element.getClientRects().length > 0);
+  const first = controls[0];
+  const last = controls[controls.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+panel.addEventListener('close', () => {
+  toggle.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('dialog-open');
+  toggle.focus({ preventScroll: true });
 });
 
 // A navigation token proves arrival at the destination, works across tabs, and
@@ -137,7 +163,7 @@ document.addEventListener('click', event => {
   const target = event.target instanceof Element ? event.target.closest('a, button') : null;
   // Firefox reports detail=1 even for Enter-generated clicks. The preceding
   // trusted key event and absence of pointer input establish keyboard use.
-  if (activationTarget && target === activationTarget) award('keyboard');
+  if (activationTarget && target === activationTarget && !target?.hasAttribute('data-skip')) award('keyboard');
   activationTarget = null;
 });
 document.addEventListener('keyup', event => {
@@ -174,7 +200,7 @@ if (typeof window.IntersectionObserver === 'function') {
 }
 recordVisibleSections();
 
-window.portfolio = Object.freeze({ claim: (name: string) => name === 'console' ? award('console') : false });
+window.helloThere = () => award('console');
 console.info(`Stuart Lee — ${t.consoleClue}`);
 
 document.getElementById('source-form')!.addEventListener('submit', event => {

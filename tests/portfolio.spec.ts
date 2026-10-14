@@ -6,7 +6,7 @@ async function awards(page: Page): Promise<string[]> {
   return page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').awarded || [], storageKey);
 }
 async function consoleClaim(page: Page) {
-  return page.evaluate(() => (window as unknown as { portfolio: { claim: (name: string) => boolean } }).portfolio.claim('console'));
+  return page.evaluate(() => window.helloThere());
 }
 async function keyboardSkip(page: Page, webkit = false) {
   await page.keyboard.press(webkit ? 'Alt+Tab' : 'Tab');
@@ -65,9 +65,13 @@ test('keyboard and skip achievements require real activation', async ({ page }, 
   expect(await awards(page)).not.toContain('keyboard');
   await page.keyboard.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
-  expect(await awards(page)).toEqual(expect.arrayContaining(['keyboard', 'skip']));
+  expect(await awards(page)).toContain('skip');
+  expect(await awards(page)).not.toContain('keyboard');
   await expect(page.locator('#achievement-notification')).toContainText('Skip ahead');
-  await expect(page.locator('#achievement-notification')).toContainText('Keyboard navigator');
+  await page.locator('[data-theme-choice="light"]').focus();
+  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press('Space');
+  expect(await awards(page)).toContain('keyboard');
   // A programmatically dispatched event cannot claim keyboard navigation.
   await page.locator('#reset-discoveries').evaluate(element => (element as HTMLElement).click());
   await page.locator('.main-nav a').first().evaluate(element => {
@@ -82,8 +86,8 @@ test('console, source codes, duplicates and reset', async ({ page }) => {
   const consoleMessages: string[] = [];
   page.on('console', message => consoleMessages.push(message.text()));
   await page.goto('/');
-  expect(consoleMessages.some(message => message.includes('portfolio.claim("console")'))).toBe(true);
-  expect(await page.evaluate(() => window.portfolio.claim('unknown'))).toBe(false);
+  expect(consoleMessages.some(message => message.includes('helloThere()'))).toBe(true);
+  expect(await page.evaluate(() => 'portfolio' in window)).toBe(false);
   expect(await consoleClaim(page)).toBe(true);
   expect(await consoleClaim(page)).toBe(false);
   await page.locator('#discoveries-toggle').click();
@@ -113,6 +117,9 @@ test('console, source codes, duplicates and reset', async ({ page }) => {
 test('all main discoveries earn the badge without developer bonuses', async ({ page }, testInfo) => {
   await page.goto('/');
   await keyboardSkip(page, testInfo.project.name === 'webkit');
+  await page.locator('[data-theme-choice="light"]').focus();
+  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await page.keyboard.press('Space');
   await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
     await page.locator(`[data-discovery-section="${id}"]`).scrollIntoViewIfNeeded();
@@ -199,4 +206,58 @@ test('section discovery works without IntersectionObserver', async ({ page }) =>
     await expect.poll(async () => page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}').seen || [], storageKey)).toContain(id);
   }
   expect(await awards(page)).toContain('story');
+});
+
+test('discoveries modal closes and restores focus without moving the page', async ({ page }) => {
+  await page.goto('/');
+  await consoleClaim(page);
+  await page.locator('#discoveries-toggle').scrollIntoViewIfNeeded();
+  const scroll = await page.evaluate(() => scrollY);
+  await page.locator('#discoveries-toggle').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.locator('#discoveries-close')).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.locator('#reset-discoveries')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.locator('#discoveries-toggle')).toBeFocused();
+  await expect(page.locator('#discoveries-toggle')).toHaveAttribute('aria-expanded', 'false');
+  expect(await page.evaluate(() => scrollY)).toBe(scroll);
+  await page.locator('#discoveries-toggle').click();
+  await page.locator('#discoveries-close').click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+
+test('appearance buttons support Space before any discoveries', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.locator('[data-theme-choice="light"]').focus();
+  await page.keyboard.press(testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await expect(page.locator('[data-theme-choice="dark"]')).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  expect(await awards(page)).toContain('keyboard');
+});
+
+test('appearance follows system, persists overrides and passes dark accessibility', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/');
+  await expect(page.locator('[data-theme-choice="system"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
+  await page.locator('[data-theme-choice="light"]').click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.locator('[data-theme-choice="dark"]').click();
+  await page.reload();
+  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  await consoleClaim(page);
+  await page.locator('#discoveries-toggle').click();
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations).toEqual([]);
+  await page.keyboard.press('Escape');
+  await page.locator('[data-theme-choice="system"]').click();
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
+  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('light');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  expect(await page.locator('html').evaluate(element => getComputedStyle(element).colorScheme)).toBe('dark');
 });

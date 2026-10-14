@@ -15,14 +15,15 @@ export interface Project {
 export interface Translation {
   meta: { title: string; description: string };
   nav: { label: string; about: string; approach: string; projects: string; contact: string; languages: string; skip: string };
-  hero: { eyebrow: string; title: string; intro: string; contact: string; more: string; note: string; years: string; focus: string; location: string };
+  hero: { eyebrow: string; title: string; intro: string; contact: string; more: string; note: string };
   about: { label: string; title: string; paragraphs: string[]; caption: string };
   approach: { label: string; title: string; items: { title: string; text: string }[] };
   projects: { label: string; title: string; status: string; intro: string; note: string; fields: { context: string; contribution: string; decisions: string; outcomes: string } };
   contact: { label: string; title: string; text: string; cta: string; github: string };
+  theme: { label: string; light: string; dark: string; system: string };
   footer: { text: string; top: string };
   game: {
-    control: string; heading: string; intro: string; mainLabel: string; bonusLabel: string; locked: string; unlocked: string;
+    control: string; close: string; heading: string; intro: string; mainLabel: string; bonusLabel: string; locked: string; unlocked: string;
     hint: string; sourceLabel: string; sourcePlaceholder: string; submit: string; invalid: string; sourceSuccess: string;
     reset: string; resetDone: string; award: string; explorer: string; complete: string; consoleClue: string;
     achievements: Record<AchievementId, { title: string; hint: string }>;
@@ -33,14 +34,13 @@ export const translations: Record<Locale, Translation> = {
   en: {
     meta: {
       title: 'Stuart Lee — Senior Frontend Engineer',
-      description: 'Senior Frontend Engineer with 20+ years in software. React, TypeScript and thoughtful, accessible web applications.',
+      description: 'Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications.',
     },
     nav: { label: 'Main navigation', about: 'About', approach: 'Approach', projects: 'Projects', contact: 'Let’s talk', languages: 'Language', skip: 'Skip to content' },
     hero: {
-      eyebrow: 'Stuart Lee / Senior Frontend Engineer', title: 'Good software.\nBuilt with care.',
-      intro: 'I build reliable, accessible web applications with React and TypeScript. Over 20 years in software have taught me to value clear thinking, practical solutions and code that lasts.',
-      contact: 'Let’s talk', more: 'A little about me', note: 'Based in the UK. Experienced in remote teams.',
-      years: 'Years in software', focus: 'React · TypeScript · JavaScript', location: 'United Kingdom',
+      eyebrow: 'Senior Frontend Engineer / UK', title: 'Hi, I’m Stuart.\nI build for the web.',
+      intro: 'I build reliable, accessible web applications with React and TypeScript. I enjoy working through tricky problems and making complex interfaces easier to use.',
+      contact: 'Connect on LinkedIn', more: 'A little about me', note: 'Based in the UK. Experienced in remote teams.',
     },
     about: {
       label: '01 / About', title: 'A frontend focus.\nA broader perspective.',
@@ -66,23 +66,24 @@ export const translations: Record<Locale, Translation> = {
       fields: { context: 'Context', contribution: 'My contribution', decisions: 'Technical decisions', outcomes: 'Outcomes' },
     },
     contact: {
-      label: '04 / Get in touch', title: 'Good work starts\nwith a conversation.',
-      text: 'Looking for a senior frontend engineer who cares about the product, the people using it and the code behind it? Let’s talk.',
+      label: '04 / Get in touch', title: 'Say hello.',
+      text: 'You can find me on LinkedIn and GitHub. I’m always happy to talk about frontend development, interesting projects or what you’re working on.',
       cta: 'Connect on LinkedIn', github: 'Find me on GitHub',
     },
-    footer: { text: 'Thoughtfully built. A few things to discover.', top: 'Back to top' },
+    theme: { label: 'Appearance', light: 'Light', dark: 'Dark', system: 'System' },
+    footer: { text: 'A few things to discover.', top: 'Back to top' },
     game: {
-      control: 'Discoveries', heading: 'A little curiosity goes a long way.',
+      control: 'Discoveries', close: 'Close', heading: 'A little curiosity goes a long way.',
       intro: 'There are a few achievements tucked into this site. Explore at your own pace; hints are here if you want them.',
       mainLabel: 'Exploration', bonusLabel: 'Developer bonuses', locked: 'Not discovered yet', unlocked: 'Discovered', hint: 'Show hint',
       sourceLabel: 'Found something in the source?', sourcePlaceholder: 'Enter the source code', submit: 'Claim discovery',
       invalid: 'That code doesn’t match. Take another look at the page source.', sourceSuccess: 'Source discovery claimed.',
       reset: 'Reset discoveries', resetDone: 'Discoveries reset. Ready to explore again.', award: 'Achievement unlocked:',
       explorer: 'Explorer', complete: 'All four exploration achievements found. Thanks for taking a closer look!',
-      consoleClue: 'Curious about how things work? Run portfolio.claim("console") to claim a bonus discovery.',
+      consoleClue: 'Curious about how things work? Run helloThere() to claim a bonus discovery.',
       achievements: {
         language: { title: 'Hallo!', hint: 'Try reading the site in its other language.' },
-        keyboard: { title: 'Keyboard navigator', hint: 'Use Tab to focus a link or button, then activate it with Enter (or Space for a button).' },
+        keyboard: { title: 'Keyboard navigator', hint: 'Use Tab to focus a link other than Skip to content and press Enter, or focus an appearance button and press Space.' },
         skip: { title: 'Skip ahead', hint: 'The first link in the keyboard order takes you straight to the content.' },
         story: { title: 'The full story', hint: 'Take a look at each section, including the introduction and the invitation to connect.' },
         console: { title: 'Console curious', hint: 'The browser’s developer console has a message for you. This is an optional desktop bonus.' },
@@ -93,14 +94,13 @@ export const translations: Record<Locale, Translation> = {
   de: {
     meta: {
       title: 'Stuart Lee — Senior Frontend Engineer',
-      description: 'Senior Frontend Engineer mit über 20 Jahren Erfahrung. React, TypeScript und durchdachte, barrierefreie Webanwendungen.',
+      description: 'Stuart Lee, Senior Frontend Engineer in Großbritannien. React, TypeScript und barrierefreie Webanwendungen.',
     },
     nav: { label: 'Hauptnavigation', about: 'Über mich', approach: 'Arbeitsweise', projects: 'Projekte', contact: 'Kontakt', languages: 'Sprache', skip: 'Zum Inhalt springen' },
     hero: {
-      eyebrow: 'Stuart Lee / Senior Frontend Engineer', title: 'Gute Software.\nMit Sorgfalt entwickelt.',
-      intro: 'Ich entwickle zuverlässige, barrierefreie Webanwendungen mit React und TypeScript. Über 20 Jahre in der Softwareentwicklung haben mich gelehrt, klares Denken, pragmatische Lösungen und langlebigen Code zu schätzen.',
-      contact: 'Kontakt aufnehmen', more: 'Mehr über mich', note: 'In Großbritannien zu Hause. Erfahren in Remote-Teams.',
-      years: 'Jahre in der Softwareentwicklung', focus: 'React · TypeScript · JavaScript', location: 'Großbritannien',
+      eyebrow: 'Senior Frontend Engineer / Großbritannien', title: 'Hallo, ich bin Stuart.\nIch entwickle fürs Web.',
+      intro: 'Ich entwickle zuverlässige, barrierefreie Webanwendungen mit React und TypeScript. Ich löse gerne knifflige Probleme und mache komplexe Oberflächen einfacher bedienbar.',
+      contact: 'Auf LinkedIn vernetzen', more: 'Mehr über mich', note: 'In Großbritannien zu Hause. Erfahren in Remote-Teams.',
     },
     about: {
       label: '01 / Über mich', title: 'Fokus auf das Frontend.\nBlick auf das Ganze.',
@@ -126,23 +126,24 @@ export const translations: Record<Locale, Translation> = {
       fields: { context: 'Kontext', contribution: 'Mein Beitrag', decisions: 'Technische Entscheidungen', outcomes: 'Ergebnisse' },
     },
     contact: {
-      label: '04 / Kontakt', title: 'Gute Zusammenarbeit\nbeginnt mit einem Gespräch.',
-      text: 'Sie suchen einen Senior Frontend Engineer, dem das Produkt, seine Nutzer und der Code dahinter wichtig sind? Lassen Sie uns sprechen.',
+      label: '04 / Kontakt', title: 'Sag hallo.',
+      text: 'Du findest mich auf LinkedIn und GitHub. Ich tausche mich gerne über Frontend-Entwicklung, interessante Projekte oder deine aktuelle Arbeit aus.',
       cta: 'Auf LinkedIn vernetzen', github: 'Mein GitHub-Profil',
     },
-    footer: { text: 'Mit Sorgfalt entwickelt. Mit ein paar Dingen zum Entdecken.', top: 'Nach oben' },
+    theme: { label: 'Darstellung', light: 'Hell', dark: 'Dunkel', system: 'System' },
+    footer: { text: 'Ein paar Dinge zum Entdecken.', top: 'Nach oben' },
     game: {
-      control: 'Entdeckungen', heading: 'Ein wenig Neugier lohnt sich.',
+      control: 'Entdeckungen', close: 'Schließen', heading: 'Ein wenig Neugier lohnt sich.',
       intro: 'Auf dieser Website sind einige Erfolge versteckt. Erkunden Sie sie in Ihrem eigenen Tempo. Bei Bedarf gibt es Hinweise.',
       mainLabel: 'Erkundung', bonusLabel: 'Entwickler-Bonus', locked: 'Noch nicht entdeckt', unlocked: 'Entdeckt', hint: 'Hinweis anzeigen',
       sourceLabel: 'Etwas im Quelltext gefunden?', sourcePlaceholder: 'Code aus dem Quelltext eingeben', submit: 'Entdeckung einlösen',
       invalid: 'Dieser Code stimmt nicht. Schauen Sie noch einmal in den Seitenquelltext.', sourceSuccess: 'Quelltext-Entdeckung eingelöst.',
       reset: 'Entdeckungen zurücksetzen', resetDone: 'Entdeckungen zurückgesetzt. Bereit für eine neue Erkundung.', award: 'Erfolg freigeschaltet:',
       explorer: 'Entdecker', complete: 'Alle vier Erkundungserfolge gefunden. Vielen Dank für den genaueren Blick!',
-      consoleClue: 'Neugierig, wie alles funktioniert? Mit portfolio.claim("console") erhalten Sie eine Bonus-Entdeckung.',
+      consoleClue: 'Neugierig, wie alles funktioniert? Mit helloThere() erhalten Sie eine Bonus-Entdeckung.',
       achievements: {
         language: { title: 'Hallo!', hint: 'Lesen Sie die Website in der anderen Sprache.' },
-        keyboard: { title: 'Tastatur-Profi', hint: 'Fokussieren Sie mit Tab einen Link oder eine Schaltfläche und aktivieren Sie das Element mit Enter (bei Schaltflächen auch mit der Leertaste).' },
+        keyboard: { title: 'Tastatur-Profi', hint: 'Fokussieren Sie mit Tab einen Link außer „Zum Inhalt springen“ und drücken Sie Enter, oder eine Darstellungsschaltfläche und drücken Sie die Leertaste.' },
         skip: { title: 'Direkt zum Inhalt', hint: 'Der erste Link in der Tastaturreihenfolge führt direkt zum Inhalt.' },
         story: { title: 'Die ganze Geschichte', hint: 'Sehen Sie sich jeden Abschnitt an, einschließlich der Einleitung und der Einladung zum Gespräch.' },
         console: { title: 'Neugierig auf die Konsole', hint: 'In der Entwicklerkonsole Ihres Browsers wartet eine Nachricht. Ein optionaler Bonus für Desktop-Nutzer.' },
