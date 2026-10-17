@@ -1,18 +1,3 @@
----
-import type { Project, ProjectFieldLabels } from '../content/types';
-
-interface Props {
-  label: string;
-  title: string;
-  status: string;
-  intro: string;
-  note: string;
-  fields: ProjectFieldLabels;
-  caseStudies: Project[];
-}
-const { label, title, status, intro, note, fields, caseStudies } = Astro.props;
----
-
 <section
   class="section wrap projects-section"
   id="projects"
@@ -20,40 +5,157 @@ const { label, title, status, intro, note, fields, caseStudies } = Astro.props;
   data-discovery-section="projects"
 >
   <div class="section-heading">
-    <p class="eyebrow">{label}</p>
+    <p class="eyebrow">03 / Projects</p>
     <h2 id="projects-heading">
-      {title.split('\n').map((line) => (
-        <span>{line}</span>
-      ))}
+      <span>Selected projects.</span>
     </h2>
+    <p class="section-caption">
+      Frontend modernisation, an application in development and a browser game
+      built under a strict size limit.
+    </p>
   </div>
   <div class="project-content">
-    {caseStudies.length === 0 ? (
-      <div class="coming-soon">
-        <p class="small-label">
-          <span class="status-mark" aria-hidden="true"></span>
-          {status}
+    <div class="project-group" aria-labelledby="professional-heading">
+      <h3 class="small-label" id="professional-heading">
+        Professional work
+      </h3>
+      <article class="case-study" id="fruugo">
+        <h4>Fruugo</h4>
+        <p>
+          At Fruugo, I maintain and expand an estate of customer and
+          retailer-facing applications. Alongside developing new features and
+          applications, I work on frontend architecture and the incremental
+          modernisation of the platform from jQuery to React and TypeScript.
         </p>
-        <p>{intro}</p>
-        <p class="project-note">{note}</p>
-        <a class="text-link" href="https://www.linkedin.com/in/beeglebug/">
-          LinkedIn<span aria-hidden="true">↗</span>
-        </a>
-      </div>
-    ) : (
-      caseStudies.map((project) => (
-        <article class="case-study" id={project.id}>
-          <h3>{project.title}</h3>
-          <dl>
-            {Object.entries(fields).map(([key, label]) => (
-              <>
-                <dt>{label}</dt>
-                <dd>{project[key as keyof typeof fields]}</dd>
-              </>
-            ))}
-          </dl>
-        </article>
-      ))
-    )}
+        <p>
+          My responsibilities span shared components, automated testing, build
+          and deployment infrastructure, production error monitoring and
+          performance investigation. I work with the team to plan delivery,
+          manage technical debt and support the ongoing needs of the live
+          platform.
+        </p>
+      </article>
+      <a class="text-link" href="https://www.linkedin.com/in/beeglebug/">
+        LinkedIn<span aria-hidden="true">↗</span>
+      </a>
+    </div>
+    <div class="project-group" aria-labelledby="independent-heading">
+      <h3 class="small-label" id="independent-heading">
+        Personal projects
+      </h3>
+      <article class="public-project" id="tabletop-atlas">
+        <p class="project-category">Web application / React &amp; TypeScript</p>
+        <h4>Tabletop Atlas</h4>
+        <p class="project-description">
+          I’m building a concept application for discovering local tabletop
+          venues, bringing a specialist dataset into a searchable guide with
+          filters and an interactive map.
+        </p>
+        <p class="project-detail">
+          Built with Next.js, React, TypeScript, Tailwind CSS and MapLibre. The
+          concept explores how clear source attribution can make local
+          information more trustworthy, with community contributions planned as
+          a future direction.
+        </p>
+        <div class="project-links">
+          <a
+            class="text-link"
+            href="https://tabletop.stuartlee.dev"
+            aria-label="Visit Tabletop Atlas — Tabletop Atlas"
+          >
+            Visit Tabletop Atlas<span aria-hidden="true">↗</span>
+          </a>
+          <a
+            class="text-link"
+            href="https://github.com/beeglebug/tabletop-atlas"
+            aria-label="View source — Tabletop Atlas"
+          >
+            View source<span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
+      <article class="public-project" id="entombed">
+        <p class="project-category">Browser game / JS13kGames 2019</p>
+        <h4>Entombed</h4>
+        <p class="project-description">
+          I developed this first-person dungeon crawler for JS13kGames 2019,
+          within the competition’s 13 KB size limit.
+        </p>
+        <p class="project-detail">
+          I built a custom raycasting engine, procedural maze generation,
+          pathfinding and enemy AI, with synthesised sound using the Web Audio
+          API.
+        </p>
+        <div class="project-links">
+          <a
+            class="text-link"
+            href="https://js13kgames.com/entries/entombed"
+            aria-label="Play Entombed — Entombed"
+          >
+            Play Entombed<span aria-hidden="true">↗</span>
+          </a>
+          <a
+            class="text-link"
+            href="https://github.com/beeglebug/js13k-19"
+            aria-label="View source — Entombed"
+          >
+            View source<span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
+
+<style>
+  .small-label {
+    font-weight: 600;
+    letter-spacing: normal;
+    line-height: 1.65;
+    color: var(--muted);
+    font-size: var(--text-small);
+    margin-block-end: 24px;
+  }
+  .project-group + .project-group {
+    margin-block-start: 48px;
+    border-block-start: 1px solid var(--line);
+    padding-block-start: 32px;
+  }
+  .case-study h4,
+  .public-project h4 {
+    font-size: var(--text-heading);
+    line-height: 1.4;
+  }
+  .case-study p {
+    margin-block-start: 12px;
+    color: var(--muted);
+    font-size: var(--text-body);
+  }
+  .project-group > .text-link {
+    margin-block-start: 20px;
+  }
+  .public-project + .public-project {
+    border-block-start: 1px solid var(--line);
+    margin-block-start: 28px;
+    padding-block-start: 28px;
+  }
+  .project-category {
+    font-weight: 600;
+    font-size: var(--text-small);
+    line-height: 1.65;
+    color: var(--accent);
+    margin-block-end: 8px;
+  }
+  .project-description,
+  .project-detail {
+    color: var(--muted);
+    font-size: var(--text-body);
+    margin-block-start: 12px;
+  }
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-block-start: 16px;
+  }
+</style>

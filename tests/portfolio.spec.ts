@@ -17,15 +17,12 @@ async function keyboardSkip(page: Page, webkit = false) {
   await page.keyboard.press('Enter');
 }
 
-for (const route of ['/', '/de/']) {
+for (const route of ['/']) {
   test(`content, metadata, mobile layouts and accessibility: ${route}`, async ({
     page,
   }) => {
     await page.goto(route);
-    await expect(page.locator('html')).toHaveAttribute(
-      'lang',
-      route === '/' ? 'en' : 'de',
-    );
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page).toHaveTitle('Stuart Lee — Senior Frontend Engineer');
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -69,31 +66,7 @@ for (const route of ['/', '/de/']) {
   });
 }
 
-test('language arrival, clean URLs and progress across locales', async ({
-  page,
-}) => {
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
-  await expect(page).toHaveURL(/\/de\/$/);
-  expect(await awards(page)).toContain('language');
-  await expect(page.locator('#achievement-notification')).toContainText(
-    'Hallo!',
-  );
-  await page.getByRole('link', { name: 'English', exact: true }).click();
-  await expect(page).toHaveURL(/4322\/$/);
-  expect((await awards(page)).filter((id) => id === 'language')).toHaveLength(
-    1,
-  );
-  await page.reload();
-  await expect(page.locator('#discoveries-toggle')).toBeVisible();
-  await page.goto('/?explore=en');
-  expect((await awards(page)).filter((id) => id === 'language')).toHaveLength(
-    1,
-  );
-  await expect(page).toHaveURL(/4322\/$/);
-});
-
-test('keyboard and skip achievements require real activation', async ({
+test('skip link remains accessible without earning an achievement', async ({
   page,
 }, testInfo) => {
   await page.goto('/');
@@ -106,11 +79,9 @@ test('keyboard and skip achievements require real activation', async ({
   expect(await awards(page)).not.toContain('keyboard');
   await page.keyboard.press('Enter');
   await expect(page.locator('#main')).toBeFocused();
-  expect(await awards(page)).toContain('skip');
+  expect(await awards(page)).not.toContain('skip');
   expect(await awards(page)).not.toContain('keyboard');
-  await expect(page.locator('#achievement-notification')).toContainText(
-    'Skip ahead',
-  );
+  await expect(page.locator('#achievement-notification')).toBeHidden();
   await page.locator('[data-theme-choice="light"]').focus();
   await page.keyboard.press(
     testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
@@ -158,7 +129,7 @@ test('console, source codes, duplicates and reset', async ({ page }) => {
   expect(await awards(page)).not.toContain('source');
   const source = await (await page.request.get('/')).text();
   expect(source).toContain('<!-- Explorer');
-  const code = source.match(/Entdecker-Code: ([A-Z-]+)\./)![1];
+  const code = source.match(/Explorer's code: ([A-Z-]+)\./)![1];
   await page.locator('#source-code').fill(` ${code.toLowerCase()} `);
   await page.locator('#source-form button').click();
   expect(await awards(page)).toEqual(
@@ -189,7 +160,6 @@ test('all main discoveries earn the badge without developer bonuses', async ({
     testInfo.project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
   );
   await page.keyboard.press('Space');
-  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
   for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
     await page
       .locator(`[data-discovery-section="${id}"]`)
@@ -204,7 +174,7 @@ test('all main discoveries earn the badge without developer bonuses', async ({
       .toContain(id);
   }
   expect(await awards(page)).toEqual(
-    expect.arrayContaining(['language', 'keyboard', 'skip', 'story']),
+    expect.arrayContaining(['keyboard', 'story']),
   );
   expect(await awards(page)).not.toContain('console');
   await page.locator('[data-theme-choice="light"]').click();
@@ -230,15 +200,9 @@ test('storage failures and malformed saved data do not break the site', async ({
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
-  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
-  await expect(page.locator('#discoveries-toggle')).toBeVisible();
-  await page.locator('#discoveries-toggle').click();
-  await expect(page.locator('[data-achievement="language"]')).toHaveAttribute(
-    'data-unlocked',
-    '',
-  );
   expect(await consoleClaim(page)).toBe(true);
   expect(await consoleClaim(page)).toBe(false);
+  await page.locator('#discoveries-toggle').click();
   await page.locator('#reset-discoveries').click();
   await expect(
     page.locator('[data-achievement="console"]'),
@@ -263,26 +227,37 @@ for (const saved of [
   });
 }
 
-test('no-JavaScript content and locale navigation', async ({ browser }) => {
+test('no-JavaScript content and skip navigation', async ({
+  browser,
+}, testInfo) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4322/');
   await expect(page.locator('#discoveries-toggle')).toBeHidden();
   await expect(page.locator('#about')).toBeVisible();
-  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+  await expect(page.locator('.language-nav')).toHaveCount(0);
+  await keyboardSkip(page, testInfo.project.name === 'webkit');
+  await expect(page).toHaveURL(/#main$/);
   await expect(page.locator('#discoveries-toggle')).toBeHidden();
   await context.close();
 });
 
-test('same-locale and invalid arrival tokens do not award language', async ({
+test('removed achievements are discarded from saved progress', async ({
   page,
 }) => {
-  for (const query of ['en', 'invalid']) {
-    await page.goto(`/?explore=${query}`);
-    expect(await awards(page)).not.toContain('language');
-    await expect(page).toHaveURL(/4322\/$/);
-  }
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'stuartlee:discoveries:v1',
+      JSON.stringify({ awarded: ['language', 'skip', 'bug'], seen: [] }),
+    );
+  });
+  await page.goto('/');
+  expect(await awards(page)).toEqual(['bug']);
+  await expect(page.locator('#discovery-count')).toHaveText('1/6');
+  await expect(
+    page.locator('[data-achievement="language"], [data-achievement="skip"]'),
+  ).toHaveCount(0);
+  await expect(page.locator('link[hreflang], .language-nav')).toHaveCount(0);
 });
 
 test('Space activates a button after native Tab focus', async ({
@@ -426,7 +401,7 @@ test('appearance follows system, persists overrides and passes dark accessibilit
   ).toBe('dark');
 });
 
-test('new discoveries require interaction and appear in both locales', async ({
+test('new achievements require interaction and persist on reload', async ({
   page,
 }) => {
   await page.goto('/');
@@ -440,7 +415,7 @@ test('new discoveries require interaction and appear in both locales', async ({
   expect(await awards(page)).toContain('bug');
   await page.locator('#discoveries-toggle').click();
   await expect(page.locator('#discovery-count')).toHaveText(
-    `${(await awards(page)).length}/8`,
+    `${(await awards(page)).length}/6`,
   );
   await expect(page.locator('#discovery-star')).toBeHidden();
   await expect(page.locator('[data-achievement="light"]')).toContainText(
@@ -451,10 +426,10 @@ test('new discoveries require interaction and appear in both locales', async ({
     '',
   );
   await page.keyboard.press('Escape');
-  await page.getByRole('link', { name: 'Deutsch', exact: true }).click();
+  await page.reload();
   await page.locator('#discoveries-toggle').click();
   await expect(page.locator('[data-achievement="light"]')).toContainText(
-    'Anderes Licht',
+    'Different light',
   );
   await expect(page.locator('[data-achievement="bug"]')).toHaveAttribute(
     'data-unlocked',
@@ -463,19 +438,10 @@ test('new discoveries require interaction and appear in both locales', async ({
 });
 
 for (const last of ['bug', 'light', 'console', 'source']) {
-  test(`all eight completion works when the last discovery is ${last}`, async ({
+  test(`all six completion works when the last discovery is ${last}`, async ({
     page,
   }) => {
-    const ids = [
-      'language',
-      'keyboard',
-      'skip',
-      'story',
-      'light',
-      'bug',
-      'console',
-      'source',
-    ];
+    const ids = ['keyboard', 'story', 'light', 'bug', 'console', 'source'];
     await page.addInitScript(
       ({ key, awarded }) => {
         localStorage.setItem(key, JSON.stringify({ awarded, seen: [] }));
@@ -494,7 +460,7 @@ for (const last of ['bug', 'light', 'console', 'source']) {
       await page.locator('#source-code').fill('BUILT-WITH-CARE');
       await page.locator('#source-form button').click();
     }
-    await expect(page.locator('#discovery-count')).toHaveText('8/8');
+    await expect(page.locator('#discovery-count')).toHaveText('6/6');
     await expect(page.locator('#discovery-star')).toBeVisible();
     await expect(page.locator('#achievement-notification')).toBeVisible();
     await expect(page.locator('#completion-notification')).toBeHidden();
@@ -502,14 +468,14 @@ for (const last of ['bug', 'light', 'console', 'source']) {
       timeout: 6000,
     });
     await expect(page.locator('#completion-notification')).toContainText(
-      'All eight discoveries found!',
+      'All six achievements unlocked!',
     );
     await expect(page.locator('#achievement-notification')).toBeHidden();
     // A repeated claim must not create another completion toast.
     await consoleClaim(page);
     if (last !== 'source') await page.locator('#discoveries-toggle').click();
     await page.locator('#reset-discoveries').click();
-    await expect(page.locator('#discovery-count')).toHaveText('0/8');
+    await expect(page.locator('#discovery-count')).toHaveText('0/6');
     await expect(page.locator('#discovery-star')).toBeHidden();
     await expect(page.locator('#completion-notification')).toBeHidden();
   });
@@ -522,22 +488,13 @@ test('completed progress restores the star without replaying the celebration', a
     localStorage.setItem(
       key,
       JSON.stringify({
-        awarded: [
-          'language',
-          'keyboard',
-          'skip',
-          'story',
-          'light',
-          'bug',
-          'console',
-          'source',
-        ],
+        awarded: ['keyboard', 'story', 'light', 'bug', 'console', 'source'],
         seen: [],
       }),
     );
   }, storageKey);
   await page.goto('/');
-  await expect(page.locator('#discovery-count')).toHaveText('8/8');
+  await expect(page.locator('#discovery-count')).toHaveText('6/6');
   await expect(page.locator('#discovery-star')).toBeVisible();
   await expect(page.locator('#completion-notification')).toBeHidden();
   await consoleClaim(page);
@@ -546,3 +503,87 @@ test('completed progress restores the star without replaying the celebration', a
   await expect(page.locator('#discovery-star')).toBeVisible();
   await expect(page.locator('#completion-notification')).toBeHidden();
 });
+
+test('hero canvas respects reduced motion and offers a pause control', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const canvas = page.locator('[data-hero-canvas]');
+  const control = page.getByRole('button', {
+    name: 'Animation',
+    exact: true,
+  });
+  await expect(canvas).toHaveAttribute('aria-hidden', 'true');
+  await expect(control).toBeVisible();
+  await expect(control).toHaveAttribute('aria-pressed', 'false');
+  await expect
+    .poll(() => canvas.evaluate((element: HTMLCanvasElement) => element.width))
+    .toBeGreaterThan(0);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(control).toHaveAttribute('aria-pressed', 'true');
+  await control.click();
+  await expect(control).toHaveAttribute('aria-pressed', 'false');
+  await page.locator('.hero').scrollIntoViewIfNeeded();
+  // Let scroll-triggered observation and canvas resizing settle before sampling.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
+  const pixels = () =>
+    canvas.evaluate((element: HTMLCanvasElement) => {
+      const pixels = element.toDataURL();
+      let hash = 0;
+      for (let i = 0; i < pixels.length; i++)
+        hash = (hash * 31 + pixels.charCodeAt(i)) | 0;
+      return hash;
+    });
+  const paused = await pixels();
+  await page.waitForTimeout(150);
+  expect(await pixels()).toBe(paused);
+  await control.click();
+  await expect(control).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('.hero').scrollIntoViewIfNeeded();
+  await expect.poll(pixels).not.toBe(paused);
+});
+
+for (const completion of [false, true]) {
+  test(`achievement toast opens modal at footer: completion=${completion}`, async ({
+    page,
+  }) => {
+    if (completion) {
+      await page.addInitScript(() => {
+        localStorage.setItem(
+          'stuartlee:discoveries:v1',
+          JSON.stringify({
+            awarded: ['keyboard', 'story', 'light', 'bug', 'source'],
+            seen: [],
+          }),
+        );
+      });
+    }
+    await page.goto('/');
+    await consoleClaim(page);
+    const toast = page.locator(
+      completion
+        ? '#completion-notification button'
+        : '#achievement-notification button',
+    );
+    await expect(toast).toBeVisible();
+    await toast.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.locator('#discoveries-close')).toBeFocused();
+    await expect(page.locator('#discoveries-toggle')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(await page.evaluate(() => scrollY)).toBeGreaterThan(500);
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(page.locator('#discoveries-toggle')).toBeFocused();
+    await expect(page.locator('#discoveries-toggle')).toBeInViewport();
+    await expect(toast).toBeHidden();
+  });
+}

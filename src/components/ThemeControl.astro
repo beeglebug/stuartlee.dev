@@ -1,30 +1,116 @@
----
-interface Props {
-  label: string;
-  light: string;
-  dark: string;
-  system: string;
-}
-const { label, light, dark, system } = Astro.props;
-const choices = [
-  { value: 'light', label: light },
-  { value: 'dark', label: dark },
-  { value: 'system', label: system },
-];
----
-
-<div class="theme-control" role="group" aria-label={label} hidden>
-  <span>{label}</span>
-  {choices.map((theme) => (
-    <button
-      type="button"
-      data-theme-choice={theme.value}
-      aria-pressed={theme.value === 'system' ? 'true' : 'false'}
-    >
-      {theme.label}
+<div class="appearance-controls">
+  <div class="theme-control" role="group" aria-label="Appearance" hidden>
+    <span>Appearance</span>
+    <button type="button" data-theme-choice="light" aria-pressed="false">
+      Light
     </button>
-  ))}
+    <button type="button" data-theme-choice="dark" aria-pressed="false">
+      Dark
+    </button>
+    <button type="button" data-theme-choice="system" aria-pressed="true">
+      System
+    </button>
+  </div>
+  <button
+    class="motion-control"
+    type="button"
+    data-hero-motion
+    aria-pressed="false"
+    hidden
+  >
+    <span>Animation</span>
+    <span class="motion-switch" aria-hidden="true"></span>
+  </button>
 </div>
 <script>
   import '../scripts/theme';
 </script>
+
+<style>
+  .theme-control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-block-end: 0;
+    font-size: var(--text-small);
+  }
+  .theme-control > span {
+    color: var(--muted);
+    margin-inline-end: 8px;
+  }
+  .theme-control button {
+    min-block-size: 36px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+  .theme-control button[aria-pressed='true'] {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--highlight);
+  }
+  @media print {
+    .theme-control {
+      display: none !important;
+    }
+  }
+
+  .appearance-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+    margin-block-end: 24px;
+  }
+  .motion-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-block-size: 36px;
+    padding: 6px 0 6px 24px;
+    border: 0;
+    border-inline-start: 1px solid var(--line);
+    background: transparent;
+    font-size: var(--text-small);
+  }
+  .motion-switch {
+    inline-size: 28px;
+    block-size: 16px;
+    border: 1px solid var(--muted);
+    border-radius: 12px;
+    padding: 2px;
+  }
+  .motion-switch::after {
+    content: '';
+    display: block;
+    inline-size: 10px;
+    block-size: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .motion-control[aria-pressed='true'] .motion-switch {
+    border-color: var(--accent);
+  }
+  .motion-control[aria-pressed='true'] .motion-switch::after {
+    background: var(--accent);
+    transform: translateX(12px);
+  }
+  @media (max-width: 640px) {
+    .appearance-controls {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .motion-control {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+  }
+  @media print {
+    .appearance-controls {
+      display: none;
+    }
+  }
+</style>

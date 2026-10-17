@@ -1,20 +1,11 @@
 ---
-import type { Locale } from '../content/types';
 import '../styles/global.css';
 
-interface Props {
-  locale: Locale;
-  title: string;
-  description: string;
-  skipLabel: string;
-}
-const { locale, title, description, skipLabel } = Astro.props;
-const base = locale === 'en' ? '/' : '/de/';
-const canonical = new URL(base, Astro.site).href;
+const canonical = new URL('/', Astro.site).href;
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,22 +19,21 @@ const canonical = new URL(base, Astro.site).href;
         /* System appearance works without storage. */
       }
     </script>
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>Stuart Lee — Senior Frontend Engineer</title>
+    <meta
+      name="description"
+      content="Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications."
+    />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="en" href="https://stuartlee.dev/" />
-    <link rel="alternate" hreflang="de" href="https://stuartlee.dev/de/" />
-    <link rel="alternate" hreflang="x-default" href="https://stuartlee.dev/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content={locale === 'en' ? 'en_GB' : 'de_DE'} />
+    <meta property="og:title" content="Stuart Lee — Senior Frontend Engineer" />
     <meta
-      property="og:locale:alternate"
-      content={locale === 'en' ? 'de_DE' : 'en_GB'}
+      property="og:description"
+      content="Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications."
     />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_GB" />
     <meta
       property="og:image"
       content="https://stuartlee.dev/social-preview.png"
@@ -54,11 +44,32 @@ const canonical = new URL(base, Astro.site).href;
     />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <body data-locale={locale}>
-    <!-- Explorer's code / Entdecker-Code: BUILT-WITH-CARE. Enter it in Discoveries / Entdeckungen. -->
+  <body>
+    <!-- Explorer's code: BUILT-WITH-CARE. Enter it in Achievements. -->
     <a class="skip-link" href="#main" data-skip>
-      {skipLabel}
+      Skip to content
     </a>
     <slot />
   </body>
 </html>
+
+<style>
+  .skip-link {
+    position: fixed;
+    inset-block-start: 12px;
+    inset-inline-start: 12px;
+    z-index: 10;
+    padding: 12px 20px;
+    background: var(--ink);
+    color: var(--paper);
+    transform: translateY(-200%);
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+  @media print {
+    .skip-link {
+      display: none !important;
+    }
+  }
+</style>

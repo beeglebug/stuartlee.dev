@@ -1,46 +1,74 @@
----
-import type { Locale } from '../content/types';
-
-interface Props {
-  locale: Locale;
-  label: string;
-  about: string;
-  approach: string;
-  projects: string;
-  languages: string;
-}
-const { locale, label, about, approach, projects, languages } = Astro.props;
-const base = locale === 'en' ? '/' : '/de/';
----
-
 <header class="site-header wrap" id="top">
-  <a class="wordmark" href={base} aria-label="Stuart Lee">
+  <a class="wordmark" href="/" aria-label="Stuart Lee">
     <span>Stuart Lee</span>
   </a>
-  <nav aria-label={label} class="main-nav">
-    <a href="#about">{about}</a>
-    <a href="#approach">{approach}</a>
-    <a href="#projects">{projects}</a>
-  </nav>
-  <nav class="language-nav" aria-label={languages}>
-    <a
-      href="/"
-      lang="en"
-      hreflang="en"
-      aria-current={locale === 'en' ? 'page' : undefined}
-      data-language="en"
-    >
-      English
-    </a>
-    <span aria-hidden="true">/</span>
-    <a
-      href="/de/"
-      lang="de"
-      hreflang="de"
-      aria-current={locale === 'de' ? 'page' : undefined}
-      data-language="de"
-    >
-      Deutsch
-    </a>
+  <nav aria-label="Main navigation" class="main-nav">
+    <a href="#about">About</a>
+    <a href="#approach">Approach</a>
+    <a href="#projects">Projects</a>
   </nav>
 </header>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-block-size: 108px;
+    border-block-end: 1px solid var(--line);
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    min-block-size: 44px;
+    font-size: var(--text-body);
+    font-weight: 600;
+  }
+  .main-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .main-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    text-decoration: none;
+    font-size: var(--text-small);
+  }
+  .main-nav a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  @media (max-width: 900px) {
+    .main-nav {
+      gap: 16px;
+    }
+  }
+  @media (max-width: 640px) {
+    .site-header {
+      min-block-size: 84px;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-block: 14px 0;
+    }
+    .main-nav {
+      order: 3;
+      inline-size: 100%;
+      justify-content: space-between;
+      border-block-start: 1px solid var(--line);
+      padding-block: 8px;
+    }
+  }
+  @media print {
+    .site-header {
+      min-block-size: 60px;
+    }
+    .main-nav {
+      display: none !important;
+    }
+  }
+</style>

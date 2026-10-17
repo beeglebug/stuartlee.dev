@@ -1,14 +1,3 @@
----
-interface Props {
-  label: string;
-  title: string;
-  paragraphs: string[];
-  caption: string;
-  bugLabel: string;
-}
-const { label, title, paragraphs, caption, bugLabel } = Astro.props;
----
-
 <section
   class="section wrap about-section"
   id="about"
@@ -16,39 +5,87 @@ const { label, title, paragraphs, caption, bugLabel } = Astro.props;
   data-discovery-section="about"
 >
   <div class="section-heading">
-    <p class="eyebrow">{label}</p>
+    <p class="eyebrow">01 / About</p>
     <h2 id="about-heading">
-      {title.split('\n').map((line) => (
-        <span>{line}</span>
-      ))}
+      <span>About me.</span>
     </h2>
-    <p class="section-caption">{caption}</p>
-    <button
-      class="beeglebug"
-      id="beeglebug"
-      type="button"
-      aria-label={bugLabel}
-      hidden
-    >
-      <svg
-        viewBox="0 0 32 32"
-        width="24"
-        height="24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <path d="m12 8-3-4m11 4 3-4M9 13l-5-2m5 7H3m7 5-5 4m18-14 5-2m-5 7h6m-7 5 5 4" />
-        <ellipse cx="16" cy="18" rx="7" ry="10" />
-        <path d="M10 13h12m-6 0v15" />
-      </svg>
-    </button>
+    <p class="section-caption">React, TypeScript and the wider web platform.</p>
   </div>
   <div class="prose">
-    {paragraphs.map((p) => (
-      <p>{p}</p>
-    ))}
+    <p>
+      I’m a senior frontend engineer with experience across e-commerce, digital
+      agencies and bespoke web applications. My role spans hands-on development,
+      technical leadership and working with product, design and backend teams to
+      turn requirements into working software.
+    </p>
+    <p>
+      At Fruugo, I work on an international e-commerce platform. Previously, I
+      spent eight years at DRPG, progressing from web developer to lead
+      developer and senior JavaScript engineer in a fast-paced agency
+      environment. I bring that delivery experience together with a background
+      in software testing.
+    </p>
+    <p class="about-handle">
+      <a href="https://github.com/beeglebug">On GitHub, I’m beeglebug.</a>
+      <button
+        class="beeglebug"
+        id="beeglebug"
+        type="button"
+        aria-label="A little bug"
+        hidden
+      >
+        <svg
+          viewBox="0 0 32 32"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="m12 8-3-4m11 4 3-4M9 13l-5-2m5 7H3m7 5-5 4m18-14 5-2m-5 7h6m-7 5 5 4" />
+          <ellipse cx="16" cy="18" rx="7" ry="10" />
+          <path d="M10 13h12m-6 0v15" />
+        </svg>
+      </button>
+    </p>
   </div>
 </section>
+
+<style>
+  .prose {
+    color: var(--muted);
+    font-size: var(--text-body);
+  }
+  .prose p + p {
+    margin-block-start: 20px;
+  }
+  .about-handle {
+    margin-block-start: 20px;
+  }
+  .beeglebug {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    margin: 0;
+    vertical-align: middle;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .beeglebug:hover,
+  .beeglebug:focus-visible {
+    color: var(--accent);
+    background: var(--highlight);
+  }
+  @media print {
+    .beeglebug {
+      display: none !important;
+    }
+  }
+</style>

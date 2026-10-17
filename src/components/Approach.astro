@@ -1,14 +1,3 @@
----
-import type { ApproachItem } from '../content/types';
-
-interface Props {
-  label: string;
-  title: string;
-  items: ApproachItem[];
-}
-const { label, title, items } = Astro.props;
----
-
 <section
   class="section wrap approach-section"
   id="approach"
@@ -16,24 +5,72 @@ const { label, title, items } = Astro.props;
   data-discovery-section="approach"
 >
   <div class="section-heading">
-    <p class="eyebrow">{label}</p>
+    <p class="eyebrow">02 / How I work</p>
     <h2 id="approach-heading">
-      {title.split('\n').map((line) => (
-        <span>{line}</span>
-      ))}
+      <span>How I work.</span>
     </h2>
   </div>
   <div class="principles">
-    {items.map((item, i) => (
-      <article class="principle">
-        <span class="principle-number" aria-hidden="true">
-          0{i + 1}
-        </span>
-        <div>
-          <h3>{item.title}</h3>
-          <p>{item.text}</p>
-        </div>
-      </article>
-    ))}
+    <article class="principle">
+      <h3>Setting technical direction</h3>
+      <p>
+        I evaluate options, explain trade-offs and shape architecture that other
+        developers can build on. When modernising existing systems, I balance
+        technical debt, dependencies and migration risk with the needs of a live
+        product.
+      </p>
+    </article>
+    <article class="principle">
+      <h3>Turning requirements into delivery</h3>
+      <p>
+        I work with product, design and backend teams to clarify requirements,
+        challenge assumptions and agree a practical approach. I break ambiguous
+        work into deliverable steps, set priorities and connect UX and design
+        decisions with the engineering needed to deliver them.
+      </p>
+    </article>
+    <article class="principle">
+      <h3>Helping the team build better</h3>
+      <p>
+        I mentor developers, review code and improve shared components, testing
+        and tooling. I use AI extensively in my development workflow and build
+        AI-assisted automations that help the team tackle recurring tasks.
+      </p>
+    </article>
+    <article class="principle">
+      <h3>Owning what reaches production</h3>
+      <p>
+        My responsibility continues after release. I work on build and
+        deployment infrastructure, monitor errors, investigate incidents and
+        diagnose performance problems, using what I learn in production to guide
+        further improvements.
+      </p>
+    </article>
+    <article class="principle">
+      <h3>Building for the people using it</h3>
+      <p>
+        I make accessibility, internationalisation, mobile optimisation and
+        performance part of product and architecture decisions from the start. I
+        balance usability, security and privacy with the constraints of the
+        platform, so the experience works well for the people relying on it.
+      </p>
+    </article>
   </div>
 </section>
+
+<style>
+  .principles {
+    display: grid;
+    gap: 28px;
+  }
+  .principle p {
+    color: var(--muted);
+    font-size: var(--text-body);
+    margin-block-start: 10px;
+  }
+  @media print {
+    .principle {
+      break-inside: avoid;
+    }
+  }
+</style>

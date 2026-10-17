@@ -1,5 +1,24 @@
 ---
-import Portfolio from '../components/Portfolio.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Approach from '../components/Approach.astro';
+import Projects from '../components/Projects.astro';
+import Contact from '../components/Contact.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import DiscoveriesDialog from '../components/DiscoveriesDialog.astro';
 ---
 
-<Portfolio locale="en" />
+<SiteLayout>
+  <SiteHeader />
+  <main id="main" tabindex="-1">
+    <Hero />
+    <About />
+    <Approach />
+    <Projects />
+    <Contact />
+  </main>
+  <SiteFooter />
+  <DiscoveriesDialog />
+</SiteLayout>

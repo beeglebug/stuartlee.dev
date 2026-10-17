@@ -1,118 +1,111 @@
----
-import type { AchievementTranslations } from '../content/types';
-import { achievementIds } from '../content/site';
-interface Props {
-  close: string;
-  heading: string;
-  intro: string;
-  mainLabel: string;
-  bonusLabel: string;
-  locked: string;
-  unlocked: string;
-  hint: string;
-  sourceLabel: string;
-  sourcePlaceholder: string;
-  submit: string;
-  invalid: string;
-  sourceSuccess: string;
-  reset: string;
-  resetDone: string;
-  award: string;
-  explorer: string;
-  complete: string;
-  consoleClue: string;
-  allComplete: string;
-  achievements: AchievementTranslations;
-}
-const {
-  close,
-  heading,
-  intro,
-  mainLabel,
-  bonusLabel,
-  locked,
-  unlocked,
-  hint,
-  sourceLabel,
-  sourcePlaceholder,
-  submit,
-  invalid,
-  sourceSuccess,
-  reset,
-  resetDone,
-  award,
-  explorer,
-  complete,
-  consoleClue,
-  allComplete,
-  achievements,
-} = Astro.props;
-const gameTranslations = {
-  close,
-  heading,
-  intro,
-  mainLabel,
-  bonusLabel,
-  locked,
-  unlocked,
-  hint,
-  sourceLabel,
-  sourcePlaceholder,
-  submit,
-  invalid,
-  sourceSuccess,
-  reset,
-  resetDone,
-  award,
-  explorer,
-  complete,
-  consoleClue,
-  allComplete,
-  achievements,
-};
----
-
 <dialog
   id="discoveries-panel"
   aria-labelledby="discoveries-heading"
   class="discoveries-panel"
 >
   <button id="discoveries-close" class="dialog-close" type="button" autofocus>
-    {close}
+    Close
     <span aria-hidden="true">×</span>
   </button>
-  <h2 id="discoveries-heading">{heading}</h2>
-  <p>{intro}</p>
+  <h2 id="discoveries-heading">Achievements</h2>
+  <p>
+    Unlock achievements as you explore the site. Each one has a hint, with two
+    optional bonuses for a closer look at the code.
+  </p>
   <div id="explorer-badge" class="explorer-badge" hidden>
-    <strong>✦ {explorer}</strong>
-    <p>{complete}</p>
+    <strong>✦ Explorer</strong>
+    <p>All four exploration achievements unlocked. Explorer badge earned!</p>
   </div>
-  {[false, true].map((bonus) => (
-    <div class="achievement-group">
-      <h3>{bonus ? bonusLabel : mainLabel}</h3>
-      <ul class="achievement-list">
-        {achievementIds
-          .filter((id) => (id === 'console' || id === 'source') === bonus)
-          .map((id) => (
-            <li data-achievement={id}>
-              <div class="achievement-title">
-                <span class="achievement-mark" aria-hidden="true">
-                  ○
-                </span>
-                <h4>{achievements[id].title}</h4>
-                <span class="achievement-state">{locked}</span>
-              </div>
-              <details>
-                <summary>{hint}</summary>
-                <p>{achievements[id].hint}</p>
-              </details>
-            </li>
-          ))}
-      </ul>
-    </div>
-  ))}
+  <div class="achievement-group">
+    <h3>Exploration</h3>
+    <ul class="achievement-list">
+      <li data-achievement="keyboard">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>Keyboard navigator</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>Give the mouse a rest.</p>
+        </details>
+      </li>
+      <li data-achievement="story">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>The full story</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>There’s more below the fold.</p>
+        </details>
+      </li>
+      <li data-achievement="light">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>Different light</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>A change of light might help.</p>
+        </details>
+      </li>
+      <li data-achievement="bug">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>Bug hunter</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>One bug made it through testing. Can you find it?</p>
+        </details>
+      </li>
+    </ul>
+  </div>
+  <div class="achievement-group">
+    <h3>Developer bonuses</h3>
+    <ul class="achievement-list">
+      <li data-achievement="console">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>Console curious</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>Some messages are for developers.</p>
+        </details>
+      </li>
+      <li data-achievement="source">
+        <div class="achievement-title">
+          <span class="achievement-mark" aria-hidden="true">
+            ○
+          </span>
+          <h4>Under the hood</h4>
+          <span class="achievement-state">Locked</span>
+        </div>
+        <details>
+          <summary>Show hint</summary>
+          <p>The page has a story beneath the surface.</p>
+        </details>
+      </li>
+    </ul>
+  </div>
   <form id="source-form" class="source-form">
-    <label for="source-code">{sourceLabel}</label>
+    <label for="source-code">Found something in the source?</label>
     <div>
       <input
         id="source-code"
@@ -120,17 +113,17 @@ const gameTranslations = {
         type="text"
         autocomplete="off"
         spellcheck="false"
-        placeholder={sourcePlaceholder}
+        placeholder="Enter the source code"
         aria-describedby="source-feedback"
       />
       <button class="button" type="submit">
-        {submit}
+        Unlock achievement
       </button>
     </div>
     <p id="source-feedback" role="status"></p>
   </form>
   <button id="reset-discoveries" class="reset-button" type="button">
-    {reset}
+    Reset achievements
   </button>
 </dialog>
 <div
@@ -140,7 +133,9 @@ const gameTranslations = {
   role="status"
   aria-live="polite"
   aria-atomic="true"
-></div>
+>
+  <button type="button" data-toast-open></button>
+</div>
 <div
   id="completion-notification"
   class="notification completion-notification"
@@ -148,12 +143,230 @@ const gameTranslations = {
   role="status"
   aria-live="polite"
   aria-atomic="true"
-></div>
-<script
-  id="game-translations"
-  type="application/json"
-  set:html={JSON.stringify(gameTranslations).replace(/</g, '\\u003c')}
-/>
+>
+  <button type="button" data-toast-open></button>
+</div>
 <script>
   import '../scripts/achievements';
 </script>
+
+<style>
+  .reset-button {
+    background: none;
+    border: 0;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .discoveries-panel {
+    color: var(--ink);
+    inline-size: min(760px, calc(100% - 40px));
+    max-block-size: calc(100dvh - 48px);
+    margin: auto;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 32px;
+    background: var(--surface);
+  }
+  .discoveries-panel h2 {
+    font-size: var(--text-heading);
+  }
+  .discoveries-panel > p {
+    color: var(--muted);
+    margin-block-start: 12px;
+    max-inline-size: 650px;
+    font-size: var(--text-small);
+  }
+  .achievement-group {
+    margin-block-start: 28px;
+  }
+  .achievement-group > h3 {
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .achievement-list {
+    list-style: none;
+    padding: 0;
+    margin-block: 12px 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .achievement-list li {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px;
+  }
+  .achievement-list li[data-unlocked] {
+    background: var(--highlight);
+    border-color: var(--highlight-line);
+  }
+  .achievement-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .achievement-title h4 {
+    font-size: var(--text-small);
+  }
+  .achievement-mark {
+    color: var(--accent);
+  }
+  .achievement-state {
+    color: var(--muted);
+    font-size: var(--text-small);
+  }
+  .achievement-list summary {
+    min-block-size: 44px;
+    display: list-item;
+    align-content: center;
+    margin-block-start: 4px;
+    font-size: var(--text-small);
+    color: var(--muted);
+    inline-size: fit-content;
+  }
+  .achievement-list details p {
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .explorer-badge {
+    margin-block-start: 24px;
+    padding: 18px;
+    border-inline-start: 3px solid var(--accent);
+    background: var(--highlight);
+  }
+  .explorer-badge strong {
+    color: var(--accent);
+  }
+  .explorer-badge p {
+    font-size: var(--text-small);
+    margin-block-start: 6px;
+  }
+  .source-form {
+    margin-block-start: 28px;
+  }
+  .source-form label {
+    display: block;
+    font-size: var(--text-small);
+    margin-block-end: 12px;
+  }
+  .source-form > div {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .source-form input {
+    min-inline-size: 0;
+    inline-size: min(100%, 300px);
+    min-block-size: 48px;
+    padding: 12px;
+    border: 1px solid #7c8998;
+    border-radius: 4px;
+    background: var(--surface);
+    font-size: var(--text-small);
+  }
+  .source-form input::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+  #source-feedback {
+    font-size: var(--text-small);
+    margin-block-start: 12px;
+  }
+  .reset-button {
+    min-block-size: 44px;
+    margin-block-start: 12px;
+    font-size: var(--text-small);
+  }
+  .notification {
+    position: fixed;
+    inset-block-end: 96px;
+    inset-inline-end: 24px;
+    z-index: 5;
+    max-inline-size: min(380px, calc(100% - 32px));
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    border-inline-start: 3px solid var(--accent);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 4px 24px #18232f12;
+    font-size: var(--text-small);
+    line-height: 1.65;
+    pointer-events: auto;
+  }
+  .notification:has(button:empty) {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  @media (max-width: 640px) {
+    .discoveries-panel {
+      padding: 20px;
+    }
+    .achievement-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .notification {
+      inset-block-end: 96px;
+      inset-inline-end: 16px;
+    }
+  }
+  @media print {
+    .discoveries-panel,
+    .notification {
+      display: none !important;
+    }
+  }
+  /* The modal locks document scrolling, outside this component’s scope. */
+  :global(body.dialog-open) {
+    overflow: hidden;
+  }
+  .discoveries-panel::backdrop {
+    background: #18232f99;
+  }
+  .dialog-close {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-block-size: 44px;
+    margin-inline-start: auto;
+    margin-block-end: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+    font-size: var(--text-small);
+  }
+  .dialog-close:hover {
+    background: var(--paper);
+  }
+  .notification[popover] {
+    inset-block-start: auto;
+    inset-inline-start: auto;
+    margin: 0;
+  }
+  .completion-notification {
+    border-color: var(--highlight-line);
+    background: var(--highlight);
+    font-weight: 600;
+  }
+
+  .notification > button {
+    display: block;
+    width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .notification > button:hover {
+    text-decoration: underline;
+  }
+</style>

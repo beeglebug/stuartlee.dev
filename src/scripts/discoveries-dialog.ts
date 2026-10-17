@@ -5,7 +5,11 @@ export function initialiseDiscoveriesDialog() {
   const panel = document.getElementById(
     'discoveries-panel',
   ) as HTMLDialogElement;
+
+  let returnScroll = { left: 0, top: 0 };
+
   toggle.addEventListener('click', () => {
+    returnScroll = { left: scrollX, top: scrollY };
     panel.showModal();
     toggle.setAttribute('aria-expanded', 'true');
     document.body.classList.add('dialog-open');
@@ -14,6 +18,7 @@ export function initialiseDiscoveriesDialog() {
   document
     .getElementById('discoveries-close')!
     .addEventListener('click', () => panel.close());
+
   panel.addEventListener('click', (event) => {
     if (event.target !== panel) return;
     const bounds = panel.getBoundingClientRect();
@@ -25,6 +30,7 @@ export function initialiseDiscoveriesDialog() {
     )
       panel.close();
   });
+
   panel.addEventListener('keydown', (event) => {
     if (event.key !== 'Tab') return;
     const controls = [
@@ -40,9 +46,11 @@ export function initialiseDiscoveriesDialog() {
       first.focus();
     }
   });
+
   panel.addEventListener('close', () => {
     toggle.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('dialog-open');
     toggle.focus({ preventScroll: true });
+    window.scrollTo({ ...returnScroll, behavior: 'instant' });
   });
 }

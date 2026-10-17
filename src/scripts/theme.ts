@@ -2,6 +2,7 @@ const root = document.documentElement;
 const controls = [
   ...document.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'),
 ];
+
 function renderTheme() {
   const selected = root.dataset.theme || 'system';
   controls.forEach((button) =>
@@ -11,8 +12,10 @@ function renderTheme() {
     ),
   );
 }
+
 document.querySelector<HTMLElement>('.theme-control')!.hidden = false;
 renderTheme();
+
 controls.forEach((button) =>
   button.addEventListener('click', () => {
     const choice = button.dataset.themeChoice!;
@@ -26,6 +29,7 @@ controls.forEach((button) =>
     renderTheme();
   }),
 );
+
 window.addEventListener('storage', (event) => {
   if (event.key !== 'stuartlee:theme' && event.key !== null) return;
   if (event.newValue === 'light' || event.newValue === 'dark')

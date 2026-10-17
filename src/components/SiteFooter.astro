@@ -1,19 +1,12 @@
 ---
-interface Props {
-  text: string;
-  top: string;
-  discoveriesLabel: string;
-  completionLabel: string;
-}
-const { text, top, discoveriesLabel, completionLabel } = Astro.props;
+import ThemeControl from './ThemeControl.astro';
 ---
 
 <footer class="site-footer wrap">
-  <slot name="appearance" />
+  <ThemeControl />
   <div class="footer-row">
     <p>
-      <span class="footer-name">Stuart Lee</span>
-      <span>{text}</span>
+      <span class="footer-name">© {new Date().getFullYear()} Stuart Lee.</span>
     </p>
     <div class="footer-actions">
       <button
@@ -23,21 +16,89 @@ const { text, top, discoveriesLabel, completionLabel } = Astro.props;
         aria-haspopup="dialog"
         hidden
       >
-        {discoveriesLabel}
+        Achievements
         <span id="discovery-count"></span>
         <span
           id="discovery-star"
           class="discovery-star"
-          aria-label={completionLabel}
+          aria-label="All six achievements unlocked! 100% complete. ★"
           hidden
         >
           ★
         </span>
       </button>
       <a href="#top">
-        {top}
+        Back to top
         <span aria-hidden="true">↑</span>
       </a>
     </div>
   </div>
 </footer>
+
+<style>
+  .site-footer {
+    padding-block: 32px;
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .footer-row > p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .footer-name {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .footer-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .footer-actions a,
+  .footer-actions button {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    gap: 8px;
+    font-size: var(--text-small);
+  }
+  .footer-actions button {
+    background: none;
+    border: 0;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  #discovery-count {
+    font-size: var(--text-small);
+    color: var(--accent);
+  }
+  @media (max-width: 640px) {
+    .footer-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .footer-row > p {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+  @media print {
+    .footer-actions {
+      display: none !important;
+    }
+  }
+  .discovery-star {
+    color: var(--accent);
+    font-size: var(--text-body);
+  }
+</style>

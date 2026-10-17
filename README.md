@@ -1,6 +1,6 @@
 # stuartlee.dev
 
-Stuart Lee’s personal portfolio. Astro + TypeScript; static HTML with small, browser-native enhancements. English at `/`, German at `/de/`. No backend, external fonts, analytics or runtime content requests.
+Stuart Lee’s personal portfolio. Astro + TypeScript; static HTML with small, browser-native enhancements. English at `/`. No backend, external fonts, analytics or runtime content requests.
 
 ## Develop and verify
 
@@ -27,13 +27,13 @@ Tests preview the production build, so run `npm run build` first. Automated acce
 
 ## Source layout
 
-- `src/pages/` — English and German route entry points.
+- `src/pages/` — Page route entry points.
 - `src/layouts/SiteLayout.astro` — document structure, metadata and initial appearance.
-- `src/components/Portfolio.astro` — assembles the page from section components.
+- `src/pages/index.astro` — assembles the page from self-contained section components.
 - `src/components/` — page sections, navigation, footer, theme control and discoveries dialog.
-- `src/content/` — translated copy, shared types and project data.
 - `src/scripts/` — browser behaviour for discoveries, the dialog and appearance.
-- `src/styles/global.css` — shared styles and light/dark colour tokens.
+- `src/styles/global.css` — theme tokens, base typography and shared layout utilities.
+- Component-specific styles live in scoped `<style>` blocks in each `.astro` component, including responsive and print rules.
 - `tests/portfolio.spec.ts` — behaviour, responsive layout and accessibility checks in Chromium, Firefox and WebKit.
 
 Astro renders the pages to static HTML at build time. Small TypeScript modules handle browser interactions; there is no React runtime or request-time server rendering.
@@ -42,9 +42,7 @@ VS Code will recommend the Astro and Prettier extensions when opening this repos
 
 ## Content
 
-Edit `src/content/locales/en.ts` or `src/content/locales/de.ts`. Both locales share the types in `src/content/types.ts` and the same components. German copy is a draft for review.
-
-The `projects` arrays in `src/content/site.ts` are initially empty. Add an approved `Project` in each locale with the same stable `id`, and translated `title`, `context`, `contribution`, `decisions` and `outcomes`. Populated lists replace the coming-soon body. Update the section title and introduction when publishing real case studies. No sample outcomes are shown publicly.
+Edit the text directly in `src/components/` and metadata in `src/layouts/SiteLayout.astro`. Achievement names and hints live in `DiscoveriesDialog.astro`; the browser script reads the names from the rendered markup. Runtime feedback messages live beside the behaviour in `src/scripts/achievements.ts`.
 
 ## Deploy through Cloudflare
 
@@ -53,20 +51,24 @@ Build with `npm run build`. In Cloudflare Pages, create a project using either:
 - **Git integration:** connect this repository, select Astro (or set `npm run build` as the build command), use `dist` as the output directory, and select a supported Node.js LTS version.
 - **Direct Upload:** upload the contents of the generated `dist` directory through the dashboard. Upload the built site, not the repository source.
 
-Add `stuartlee.dev` as a custom domain in the Pages project and follow the dashboard’s DNS instructions. No Worker, adapter, secrets or database are needed. Verify `/`, `/de/`, local assets, `/robots.txt` and `/sitemap.xml` after deployment. Preview domains intentionally retain production canonical URLs.
+Add `stuartlee.dev` as a custom domain in the Pages project and follow the dashboard’s DNS instructions. No Worker, adapter, secrets or database are needed. Verify `/`, local assets, `/robots.txt` and `/sitemap.xml` after deployment. Preview domains intentionally retain production canonical URLs.
 
 This repository has not been deployed by Codex.
 
 ## Discovery achievements
 
-Six exploration achievements earn an Explorer badge: switch locale, activate an element other than the skip link after Tab navigation, use the skip link, view all five main sections, change the appearance setting, and greet the little Beeglebug in About. Two optional bonuses are earned through the console and a source comment. The first unlock exposes a control in the footer that opens the discoveries modal.
+Four exploration achievements earn an Explorer badge: activate an element other than the skip link after Tab navigation, view all five main sections, change the appearance setting, and greet beeglebug in About. Two optional bonuses are earned through the console and a source comment. The first unlock exposes the Achievements control in the footer.
 
-Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. An ephemeral `explore` URL parameter records arrival after language switching, including when storage is unavailable, and is removed on arrival. Locale changes preserve saved achievements and section progress. Reset clears both. Collecting all eight discoveries adds a persistent star beside the total and shows a separate completion toast after the final discovery toast. Reloading restores the star without repeating the celebration.
+Progress is stored only in this browser under `stuartlee:discoveries:v1`; it is not transmitted. Storage failure falls back to memory. Old language and skip achievements are filtered out of saved progress. Reset clears awards and section progress. Collecting all six achievements adds a persistent star and a completion toast. Reloading restores the star without repeating the celebration.
 
 Keyboard navigation follows browser settings. On macOS Safari, use Option–Tab if ordinary Tab does not focus links; the site does not intercept or replace native navigation.
 
-The console exposes only `helloThere()`. Source codes are playful discoveries, not secrets. HTML compression is disabled to retain the source clue. Without JavaScript, content, skip navigation and locale links work; game controls stay hidden.
+The console exposes only `helloThere()`. Source codes are playful discoveries, not secrets. HTML compression is disabled to retain the source clue. Without JavaScript, content and skip navigation work; game controls stay hidden.
 
 ## Appearance
 
 Light, dark and system controls are in the footer. System is the default and follows OS changes. An explicit choice is stored locally under `stuartlee:theme` and applied before rendering. Without JavaScript, the site follows system appearance.
+
+## Hero background
+
+A decorative Canvas 2D contour animation runs at up to 30 fps, with device pixel ratio capped at 2. It pauses off-screen and in hidden tabs, has an explicit pause toggle, and renders a still frame for reduced-motion preferences. It uses the theme accent and makes no network requests.
