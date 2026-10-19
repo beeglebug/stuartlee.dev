@@ -9,7 +9,17 @@ const achievementIds = [
   'source',
 ] as const;
 type AchievementId = (typeof achievementIds)[number];
-const mainAchievements: AchievementId[] = ['keyboard', 'story', 'light', 'bug'];
+// Use input capabilities rather than viewport width: narrow desktop windows
+// still have a keyboard and developer tools; touch-first devices usually don't.
+const touchFirst =
+  window.matchMedia('(pointer: coarse)').matches &&
+  !window.matchMedia('(any-pointer: fine)').matches;
+const availableAchievements = achievementIds.filter(
+  (id) => !touchFirst || !['keyboard', 'console', 'source'].includes(id),
+);
+const mainAchievements = availableAchievements.filter(
+  (id) => id !== 'console' && id !== 'source',
+);
 
 declare global {
   interface Window {
@@ -70,18 +80,19 @@ function isExplorationComplete() {
 }
 
 function isAllComplete() {
-  return achievementIds.every((id) => awarded.has(id));
+  return availableAchievements.every((id) => awarded.has(id));
 }
 
 function renderProgress() {
   // Keep the control available after a reset, so it doesn't disappear beneath focus.
   if (awarded.size) achievementsButton.hidden = false;
   document.getElementById('discovery-count')!.textContent =
-    `${awarded.size}/${achievementIds.length}`;
+    `${availableAchievements.filter((id) => awarded.has(id)).length}/${availableAchievements.length}`;
   for (const id of achievementIds) {
     const item = document.querySelector<HTMLElement>(
       `[data-achievement="${id}"]`,
     )!;
+    item.hidden = !availableAchievements.includes(id);
     const unlocked = awarded.has(id);
     item.toggleAttribute('data-unlocked', unlocked);
     item.querySelector('.achievement-mark')!.textContent = unlocked ? '✓' : '○';
@@ -130,7 +141,7 @@ function celebrateCompletion() {
 }
 
 function award(id: AchievementId): boolean {
-  if (awarded.has(id)) return false;
+  if (!availableAchievements.includes(id) || awarded.has(id)) return false;
   const wasExplorationComplete = isExplorationComplete();
   const wasAllComplete = isAllComplete();
   awarded.add(id);
@@ -146,6 +157,18 @@ function award(id: AchievementId): boolean {
   announce(message);
   if (!wasAllComplete && isAllComplete()) celebrateCompletion();
   return true;
+}
+
+if (touchFirst) {
+  document.getElementById('developer-bonuses')!.hidden = true;
+  document.getElementById('source-form')!.hidden = true;
+  document.getElementById('discoveries-description')!.textContent =
+    'Unlock achievements as you explore the site. Each one has a hint.';
+  explorerBadge.querySelector('p')!.textContent =
+    'All exploration achievements unlocked. Explorer badge earned!';
+  document
+    .getElementById('discovery-star')!
+    .setAttribute('aria-label', 'All achievements unlocked! 100% complete. ★');
 }
 
 // Persist only recognised IDs when restoring older saved progress.

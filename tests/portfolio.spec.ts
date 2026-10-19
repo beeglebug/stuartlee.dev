@@ -587,3 +587,61 @@ for (const completion of [false, true]) {
     await expect(toast).toBeHidden();
   });
 }
+
+test('touch-first visitors can complete every available achievement', async ({
+  browser,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name === 'firefox',
+    'Firefox does not emulate touch contexts',
+  );
+  const context = await browser.newContext({
+    hasTouch: true,
+    viewport: { width: 390, height: 844 },
+    reducedMotion: 'reduce',
+  });
+  const page = await context.newPage();
+  // Retain desktop progress without counting it towards the mobile set.
+  await page.addInitScript((key) => {
+    localStorage.setItem(
+      key,
+      JSON.stringify({ awarded: ['keyboard', 'console', 'source'], seen: [] }),
+    );
+  }, storageKey);
+  await page.goto('/');
+  await expect(page.locator('#discovery-count')).toHaveText('0/3');
+  await page.locator('#discoveries-toggle').click();
+  await expect(page.locator('[data-achievement="keyboard"]')).toBeHidden();
+  await expect(page.locator('#developer-bonuses')).toBeHidden();
+  await expect(page.locator('#source-form')).toBeHidden();
+  await page.locator('#discoveries-close').click();
+  await page
+    .locator('[data-theme-choice][aria-pressed="false"]')
+    .first()
+    .click();
+  await page.locator('#beeglebug').click();
+  for (const id of ['intro', 'about', 'approach', 'projects', 'contact']) {
+    await page
+      .locator(`[data-discovery-section="${id}"]`)
+      .scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () =>
+        page.evaluate(
+          (key) => JSON.parse(localStorage.getItem(key)!).seen,
+          storageKey,
+        ),
+      )
+      .toContain(id);
+  }
+  await expect(page.locator('#discovery-count')).toHaveText('3/3');
+  await expect(page.locator('#discovery-star')).toBeVisible();
+  await page.locator('#discoveries-toggle').click();
+  await expect(page.locator('#explorer-badge')).toBeVisible();
+  expect(await awards(page)).toEqual(
+    expect.arrayContaining(['keyboard', 'console', 'source']),
+  );
+  await page.locator('#reset-discoveries').click();
+  await expect(page.locator('#discovery-count')).toHaveText('0/3');
+  await expect(page.locator('#discovery-star')).toBeHidden();
+  await context.close();
+});
