@@ -1,0 +1,114 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+const title = 'Privacy notice — Personal Calendar Display';
+const description =
+  'Privacy information for a private personal calendar display operated by Stuart Lee.';
+---
+
+<SiteLayout
+  {title}
+  {description}
+  path="/dashboard/privacy/"
+  robots="noindex, nofollow, noarchive"
+>
+  <main id="main" class="privacy-page" tabindex="-1">
+    <article>
+      <p class="eyebrow">Personal Calendar Display</p>
+      <h1>Privacy notice</h1>
+
+      <p class="summary">
+        This is a private, personal utility operated by Stuart Lee. It displays
+        calendar information for the Google account owner on a privately
+        operated household device. It is not offered to the public.
+      </p>
+
+      <section aria-labelledby="access-heading">
+        <h2 id="access-heading">Google data accessed</h2>
+        <p>
+          The utility requests read-only access to Google Calendar. It reads
+          calendar names and event details, including titles, dates, times and
+          locations, solely to provide the display requested by the account
+          owner. It cannot create, change or delete calendar data.
+        </p>
+      </section>
+
+      <section aria-labelledby="storage-heading">
+        <h2 id="storage-heading">Storage and sharing</h2>
+        <p>
+          Calendar information is cached on a privately controlled device for
+          reliability. It is not sold, used for advertising or shared with
+          other organisations. Access credentials are kept private and are not
+          sent to the display.
+        </p>
+      </section>
+
+      <section aria-labelledby="control-heading">
+        <h2 id="control-heading">Control</h2>
+        <p>
+          The account owner can revoke access at any time from their Google
+          Account’s third-party connections page. Cached information can be
+          removed by deleting the utility’s local data.
+        </p>
+      </section>
+
+      <p class="updated">Last updated: 22 October 2026</p>
+      <a href="/">Return to stuartlee.dev</a>
+    </article>
+  </main>
+</SiteLayout>
+
+<style>
+  .privacy-page {
+    min-block-size: 100vh;
+    padding: clamp(48px, 8vw, 96px) 24px;
+  }
+
+  article {
+    inline-size: min(680px, 100%);
+    margin-inline: auto;
+  }
+
+  .eyebrow {
+    color: var(--accent);
+    margin-block-end: 16px;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+  }
+
+  .summary {
+    color: var(--muted);
+    font-size: 1.125rem;
+    margin-block: 32px 56px;
+  }
+
+  section {
+    border-block-start: 1px solid var(--line);
+    padding-block: 28px;
+  }
+
+  section h2 {
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    margin-block-end: 12px;
+  }
+
+  section p,
+  .updated {
+    color: var(--muted);
+  }
+
+  .updated {
+    font-size: var(--text-small);
+    margin-block: 28px 20px;
+  }
+
+  article > a {
+    display: inline-flex;
+    min-block-size: 44px;
+    align-items: center;
+    font-weight: 600;
+  }
+</style>

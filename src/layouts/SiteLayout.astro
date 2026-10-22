@@ -1,7 +1,21 @@
 ---
 import '../styles/global.css';
 
-const canonical = new URL('/', Astro.site).href;
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+  robots?: string;
+}
+
+const {
+  title = 'Stuart Lee — Senior Frontend Engineer',
+  description =
+    'Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications.',
+  path = '/',
+  robots,
+} = Astro.props;
+const canonical = new URL(path, Astro.site).href;
 ---
 
 <!doctype html>
@@ -19,19 +33,16 @@ const canonical = new URL('/', Astro.site).href;
         /* System appearance works without storage. */
       }
     </script>
-    <title>Stuart Lee — Senior Frontend Engineer</title>
-    <meta
-      name="description"
-      content="Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications."
-    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
+    {robots && <meta name="googlebot" content={robots} />}
+    <meta name="referrer" content="no-referrer" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Stuart Lee — Senior Frontend Engineer" />
-    <meta
-      property="og:description"
-      content="Stuart Lee, Senior Frontend Engineer based in the UK. React, TypeScript and accessible web applications."
-    />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="en_GB" />
     <meta
@@ -40,7 +51,7 @@ const canonical = new URL('/', Astro.site).href;
     />
     <meta
       property="og:image:alt"
-      content="Stuart Lee — Senior Frontend Engineer"
+      content={title}
     />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
