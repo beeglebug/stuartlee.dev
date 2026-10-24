@@ -1,0 +1,288 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+const title = 'Home Dashboard — Stuart Lee';
+const description =
+  'A household dashboard for an upcycled tablet, combining weather, calendars, school schedules, bin collections and birthdays.';
+---
+
+<SiteLayout {title} {description} path="/projects/home-dashboard/">
+  <header class="case-study-header wrap" id="top">
+    <a class="wordmark" href="/" aria-label="Stuart Lee home">
+      Stuart Lee
+    </a>
+    <a class="back-link" href="/#projects">
+      <span aria-hidden="true">←</span> Back to projects
+    </a>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <article>
+      <header class="hero wrap">
+        <p class="eyebrow">Case study / Personal project</p>
+        <h1>Home Dashboard</h1>
+        <p class="intro">
+          A household dashboard built built to run on old tablet. It brings
+          together weather, calendars, school schedules, bin collections and
+          birthdays in one glanceable display.
+        </p>
+      </header>
+
+      <figure class="dashboard-figure wrap">
+        <img
+          src="/images/home-dashboard.webp"
+          alt="Home Dashboard showing the time, weather, calendar, family schedule, bin collections and birthdays"
+          width="1922"
+          height="1200"
+        />
+        <figcaption>
+          The landscape tablet layout, shown with representative data.
+        </figcaption>
+      </figure>
+
+      <div class="case-study-body wrap">
+        <div class="case-study-copy">
+          <section aria-labelledby="problem-heading">
+            <p class="section-number">01</p>
+            <div>
+              <h2 id="problem-heading">The problem</h2>
+              <p>
+                Household information was spread across several apps, websites
+                and individual routines. I wanted a single view that answered a
+                simple question:{' '}
+                <strong>What does everyone need to know today?</strong>
+              </p>
+            </div>
+          </section>
+
+          <section aria-labelledby="approach-heading">
+            <p class="section-number">02</p>
+            <div>
+              <h2 id="approach-heading">The solution</h2>
+              <p>
+                The interface is designed around the tablet’s landscape display
+                and limited screen space. Clear cards, strong typography and
+                restrained colour make it easy to scan.
+              </p>
+              <p>
+                The dashboard also adapts throughout the day. Once the family’s
+                scheduled activities have finished for the day, relevant
+                sections automatically switch to displaying tomorrow’s
+                information.
+              </p>
+            </div>
+          </section>
+
+          <section aria-labelledby="how-heading">
+            <p class="section-number">03</p>
+            <div>
+              <h2 id="how-heading">The implementation</h2>
+              <p>
+                The React frontend is backed by a Fastify API that normalises
+                data from Google Calendar, Open-Meteo and the local council’s
+                collection service.
+              </p>
+              <p>
+                Provider responses are stored in SQLite, giving the application
+                a small persistent cache. If a source becomes unavailable, the
+                dashboard continues showing its last successful data and marks
+                it as stale.
+              </p>
+              <p>
+                CSS Modules provide scoped styling and precise control over the
+                tablet and mobile layouts.
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <aside aria-labelledby="stack-heading">
+          <h2 id="stack-heading">Stack</h2>
+          <p>
+            React, TypeScript, Fastify, SQLite, CSS Modules, Vite and Docker.
+          </p>
+        </aside>
+      </div>
+    </article>
+  </main>
+
+  <footer class="case-study-footer wrap">
+    <a href="/">Stuart Lee</a>
+    <a href="#top">
+      Back to top <span aria-hidden="true">↑</span>
+    </a>
+  </footer>
+</SiteLayout>
+
+<style>
+  .case-study-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-block-size: 108px;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .wordmark,
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    font-weight: 600;
+  }
+
+  .wordmark {
+    text-decoration: none;
+  }
+
+  .back-link {
+    gap: 12px;
+    font-size: var(--text-small);
+  }
+
+  .hero {
+    padding-block: clamp(64px, 10vw, 120px);
+  }
+
+  .hero .eyebrow {
+    color: var(--accent);
+    margin-block-end: 20px;
+  }
+
+  .hero h1 {
+    max-inline-size: 900px;
+  }
+
+  .intro {
+    max-inline-size: 760px;
+    margin-block-start: 32px;
+    color: var(--muted);
+    font-size: clamp(1.125rem, 2vw, 1.4rem);
+    line-height: 1.6;
+  }
+
+  .dashboard-figure {
+    margin-block: 0;
+  }
+
+  .dashboard-figure img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f1f2ed;
+  }
+
+  .dashboard-figure figcaption {
+    margin-block-start: 12px;
+    color: var(--muted);
+    font-size: var(--text-small);
+  }
+
+  .case-study-body {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(220px, 0.7fr);
+    gap: clamp(48px, 9vw, 112px);
+    padding-block: clamp(72px, 10vw, 120px);
+  }
+
+  .case-study-copy section {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 24px;
+    border-block-start: 1px solid var(--line);
+    padding-block: 40px;
+  }
+
+  .case-study-copy section:first-child {
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  .section-number {
+    color: var(--accent);
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+
+  .case-study-copy h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-block-end: 18px;
+  }
+
+  .case-study-copy section p:not(.section-number),
+  aside p {
+    color: var(--muted);
+  }
+
+  .case-study-copy section p + p {
+    margin-block-start: 16px;
+  }
+
+  aside {
+    align-self: start;
+    border-block-start: 3px solid var(--accent);
+    padding-block-start: 20px;
+  }
+
+  aside h2 {
+    font-size: var(--text-heading);
+    letter-spacing: -0.01em;
+    margin-block-end: 12px;
+  }
+
+  .case-study-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    border-block-start: 1px solid var(--line);
+    padding-block: 32px;
+    font-size: var(--text-small);
+  }
+
+  .case-study-footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-block-size: 44px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 700px) {
+    .case-study-header {
+      min-block-size: 84px;
+    }
+
+    .case-study-body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 48px;
+    }
+
+    .case-study-copy section {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      padding-block: 32px;
+    }
+  }
+
+  @media print {
+    .case-study-header,
+    .case-study-footer {
+      min-block-size: 0;
+      padding-block: 16px;
+    }
+
+    .back-link,
+    .case-study-footer a:last-child {
+      display: none;
+    }
+
+    .hero,
+    .case-study-body {
+      padding-block: 32px;
+    }
+  }
+</style>
